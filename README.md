@@ -1,0 +1,1 @@
+The Bedrock Assembler Library is a Python library made to automate the creation of add-on packs for Minecraft Bedrock Edition. It is particularly aimed at writing JSON files with code, enabling the automation of tedious and repetitive tasks.
