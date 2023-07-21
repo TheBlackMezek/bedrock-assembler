@@ -1,5 +1,5 @@
 import json
-from component import (
+from brockassemble.component import (
     Component,
     component_skin_id,
     component_attack,

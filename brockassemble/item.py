@@ -1,4 +1,4 @@
-import component as component
+import brockassemble.component as component
 
 
 ITEM_BVR_FORMAT_VERSION = '1.16.100'
