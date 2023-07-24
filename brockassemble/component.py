@@ -1,3 +1,7 @@
+"""
+Module containing the Component class and functions for generating various
+entity components.
+"""
 from typing import Union
 
 

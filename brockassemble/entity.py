@@ -1,3 +1,7 @@
+"""
+Module containing classes which abstract elements of entity JSON,
+as well as a few functions for generating basic entities.
+"""
 import json
 from brockassemble.component import (
     Component,

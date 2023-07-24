@@ -1,3 +1,6 @@
+"""
+Module containing the Item class, for generating custom in-game items.
+"""
 import brockassemble.component as component
 
 

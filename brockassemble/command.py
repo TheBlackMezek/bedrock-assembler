@@ -1,4 +1,7 @@
-
+"""
+Module containing functions for generating in-game commands
+and elements of commands.
+"""
 
 def selector(base_selector: str,
              tags: list = None,
