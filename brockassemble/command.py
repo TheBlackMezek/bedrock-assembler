@@ -4,8 +4,8 @@ and elements of commands.
 """
 
 def selector(base_selector: str,
-             tags: list = None,
-             not_tags: list = None,
+             tags: list[str] = None,
+             not_tags: list[str] = None,
              radius: float = None,
              max_selected: int = None,
              x: float = None,
@@ -14,19 +14,91 @@ def selector(base_selector: str,
              dx: float = None,
              dy: float = None,
              dz: float = None,
-             rotation_x: float = None,
-             rotation_y: float = None,
+             rotation_x: float | str = None,
+             rotation_y: float | str = None,
              xp_lvl_min: int = None,
              xp_lvl_max: int = None,
-             gamemode: str = None,
-             not_gamemode: str = None,
+             gamemode: str | int = None,
+             not_gamemode: str | int = None,
              name: str = None,
-             not_names: list = None,
+             not_names: list[str] = None,
              entity_id: str = None,
-             not_entity_ids: list = None,
-             families: list = None,
-             not_families: list = None) -> str:
-    '''Base selector can be any of the following: a, p, s, e, r'''
+             not_entity_ids: list[str] = None,
+             families: list[str] = None,
+             not_families: list[str] = None) -> str:
+    """
+    Creates a target selector.
+
+    Parameters
+    ----------
+    base_selector : str
+        The root of the target selector. Valid characters are:
+        a (all players),
+        p (nearest player),
+        s (self),
+        e (all entities, add further conditions to this or it can cause lag),
+        r (random player)
+    tags : list[str]
+        A list of tags which must all be present on the target entity.
+    not_tags : list[str]
+        A list of tags which must all be absent from the target entity.
+    radius : float
+        The maximum distance target entities can be from the command origin.
+    max_selected : int
+        The maximum number of entities which can be selected.
+        Will prioritize entities closer to the command origin.
+    x, y, z : float
+        Coordinates for the command origin, which can be in absolute
+        coordinates or relative tilde '~' coordinates.
+        It cannot be in relative caret '^' coordinates.
+    dx, dy, dz : float
+        Dimensions of a bounding box which selected entities must be within.
+        If used with the x, y, z parameters, they set the corner of the box
+        which dx, dy, dz stretch out from. For example, x=10 and dx=5 would
+        create a bounding box with X axis boundaries of 10 and 15. Otherwise,
+        command caller's position is used. 
+    rotation_x, rotation_y : float | str
+        Specify the direction the entity must be facing.
+        Can be given as a specific value (x_rotation=50)
+        or a range (x_rotation='30..60').
+        Values for x_rotation (vertical) range from -90 (straight up) to
+        90 (straight down).
+        Values for y_rotation (horizontal) range from -180 (north)
+        to -90 (east) to 0 (south) to 90 (west) to 180 (north again).
+    xp_level_min : int
+        Minimum XP level for the target entity.
+    xp_level_max : int
+        Maximum XP level for the target entity.
+    gamemode : str | int
+        Gamemode requirement for the target. Only useful for players.
+        Possible values are 'spectator', 'survival', 'creative',
+        and 'adventure'. Acceptable shorthand values are 's' or 0 for survival,
+        'c' or 1 for creative, and 'a' or 2 for adventure.
+    not_gamemode : str | int
+        Requirement that the target is not in this gamemode. Only useful for
+        players. Accepts same possible values as previously listed for the
+        gamemode parameter.
+    name : str
+        The name the target must have. Non-player entities have a default
+        name value, which can be altered with commands and nametags.
+        Distinct from entity ID, which cannot be changed in-game.
+    not_names : list[str]
+        Names which the targets must not have.
+    entity_id : str
+        The specific class of entity to target. Don't forget to include the
+        namespace.
+    not_entity_ids : list[str]
+        The specific classes of entity not to target.
+    families : list[str]
+        The entity families the targets must belong to.
+    not_families : list[str]
+        The entity families the targets must not belong to.
+
+    Returns
+    -------
+    str
+        A target selector which can be used in an in-game command.
+    """
 
     s = '@'+base_selector
 
@@ -96,7 +168,7 @@ def selector(base_selector: str,
 def command_base(cmd: str,
                  selector: str = None,
                  include_slash: bool = True) -> str:
-    '''For internal command_builder use'''
+    """For internal command_builder use"""
     ret = ''
     if include_slash:
         ret += '/'
@@ -117,7 +189,7 @@ def execute(cmd: str,
             detect_x: str = '~',
             detect_y: str = '~',
             detect_z: str = '~') -> str:
-    '''All position arguments can also be floats'''
+    """All position arguments can also be floats"""
     ret = command_base('execute', selector, include_slash)
     ret += f' {x} {y} {z}'
     if detect_block is not None:
@@ -155,10 +227,10 @@ def tp(victim_selector: str = None,
        facing_z: str = None,
        check_for_blocks: bool = False,
        include_slash: bool = True) -> str:
-    '''Must be supplied EITHER with target_selector or x y z\n
+    """Must be supplied EITHER with target_selector or x y z\n
        Use one at most of: y_rot & x_rot; facing_selector; facing_x y z\n
        check_for_blocks checks if destination has only nonsolid blocks\n
-       All position arguments can also be floats'''
+       All position arguments can also be floats"""
     ret = command_base('tp', include_slash=include_slash)
 
     if victim_selector is not None:
@@ -189,7 +261,7 @@ def effect(selector: str,
            hide_particles: bool = False,
            clear: bool = False,
            include_slash: bool = True):
-    '''If clear==True, all other parameters will be ignored'''
+    """If clear==True, all other parameters will be ignored"""
     ret = command_base('effect', selector, include_slash)
     if clear:
         ret += ' clear'
@@ -209,7 +281,7 @@ def summon(entity_id: str,
            z: str = None,
            spawn_event: str = None,
            include_slash: bool = True):
-    '''Make sure you provide coordinates if using spawn_event!'''
+    """Make sure you provide coordinates if using spawn_event!"""
     ret = command_base('summon', entity_id, include_slash)
 
     if spawn_event is not None or name is None:
@@ -233,8 +305,8 @@ def tag(selector: str,
         mode_remove: bool = False,
         mode_list: bool = False,
         include_slash: bool = True) -> str:
-    '''Set EXACTLY ONE mode argument to True\n
-       tag_id will not be used if mode_list==True'''
+    """Set EXACTLY ONE mode argument to True\n
+       tag_id will not be used if mode_list==True"""
     ret = command_base('tag', selector, include_slash)
     if mode_add:
         ret += ' add '+tag_id
@@ -251,8 +323,8 @@ def summon_rider(target_selector: str,
                  spawn_event: str = None,
                  nametag: str = None,
                  include_slash: bool = True) -> str:
-    '''If using nametag, you MUST include spawn_event\n
-       For most mobs, spawn_event should be "minecraft:entity_spawned"'''
+    """If using nametag, you MUST include spawn_event\n
+       For most mobs, spawn_event should be 'minecraft:entity_spawned'"""
     ret = command_base('ride', target_selector, include_slash)
     ret += ' summon_rider'
     ret += ' '+rider_type
