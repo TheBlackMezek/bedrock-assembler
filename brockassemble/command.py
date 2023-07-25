@@ -3,29 +3,30 @@ Module containing functions for generating in-game commands
 and elements of commands.
 """
 
-def selector(base_selector: str,
-             tags: list[str] = None,
-             not_tags: list[str] = None,
-             radius: float = None,
-             max_selected: int = None,
-             x: float = None,
-             y: float = None,
-             z: float = None,
-             dx: float = None,
-             dy: float = None,
-             dz: float = None,
-             rotation_x: float | str = None,
-             rotation_y: float | str = None,
-             xp_lvl_min: int = None,
-             xp_lvl_max: int = None,
-             gamemode: str | int = None,
-             not_gamemode: str | int = None,
-             name: str = None,
-             not_names: list[str] = None,
-             entity_id: str = None,
-             not_entity_ids: list[str] = None,
-             families: list[str] = None,
-             not_families: list[str] = None) -> str:
+def selector(
+        base_selector: str,
+        tags: list[str] = None,
+        not_tags: list[str] = None,
+        radius: float = None,
+        max_selected: int = None,
+        x: float = None,
+        y: float = None,
+        z: float = None,
+        dx: float = None,
+        dy: float = None,
+        dz: float = None,
+        rotation_x: float | str = None,
+        rotation_y: float | str = None,
+        xp_lvl_min: int = None,
+        xp_lvl_max: int = None,
+        gamemode: str | int = None,
+        not_gamemode: str | int = None,
+        name: str = None,
+        not_names: list[str] = None,
+        entity_id: str = None,
+        not_entity_ids: list[str] = None,
+        families: list[str] = None,
+        not_families: list[str] = None) -> str:
     """
     Creates a target selector.
 
@@ -165,10 +166,29 @@ def selector(base_selector: str,
     return s
 
 
-def command_base(cmd: str,
-                 selector: str = None,
-                 include_slash: bool = True) -> str:
-    """For internal command_builder use"""
+def _command_stem(
+        cmd: str,
+        selector: str = None,
+        include_slash: bool = True) -> str:
+    """
+    Creates a command string stem which command parameters can be added to.
+
+    Parameters
+    ----------
+    cmd : str
+        The name of the command, such as 'tp' or 'summon'.
+    selector : str
+        The target selector, such as '@e[r=10]'.
+    include_slash : bool
+        Whether or not the command begins with a forward slash '/'. This is
+        necessary for some cases but will break others.
+    
+    Returns
+    -------
+    str
+        The fully assembled command stem.
+        Example: '/tp @e[r=10]'.
+    """
     ret = ''
     if include_slash:
         ret += '/'
@@ -190,7 +210,7 @@ def execute(cmd: str,
             detect_y: str = '~',
             detect_z: str = '~') -> str:
     """All position arguments can also be floats"""
-    ret = command_base('execute', selector, include_slash)
+    ret = _command_stem('execute', selector, include_slash)
     ret += f' {x} {y} {z}'
     if detect_block is not None:
         ret += ' detect'
@@ -231,7 +251,7 @@ def tp(victim_selector: str = None,
        Use one at most of: y_rot & x_rot; facing_selector; facing_x y z\n
        check_for_blocks checks if destination has only nonsolid blocks\n
        All position arguments can also be floats"""
-    ret = command_base('tp', include_slash=include_slash)
+    ret = _command_stem('tp', include_slash=include_slash)
 
     if victim_selector is not None:
         ret += ' '+victim_selector
@@ -262,7 +282,7 @@ def effect(selector: str,
            clear: bool = False,
            include_slash: bool = True):
     """If clear==True, all other parameters will be ignored"""
-    ret = command_base('effect', selector, include_slash)
+    ret = _command_stem('effect', selector, include_slash)
     if clear:
         ret += ' clear'
         return ret
@@ -282,7 +302,7 @@ def summon(entity_id: str,
            spawn_event: str = None,
            include_slash: bool = True):
     """Make sure you provide coordinates if using spawn_event!"""
-    ret = command_base('summon', entity_id, include_slash)
+    ret = _command_stem('summon', entity_id, include_slash)
 
     if spawn_event is not None or name is None:
         if x is not None:
@@ -307,7 +327,7 @@ def tag(selector: str,
         include_slash: bool = True) -> str:
     """Set EXACTLY ONE mode argument to True\n
        tag_id will not be used if mode_list==True"""
-    ret = command_base('tag', selector, include_slash)
+    ret = _command_stem('tag', selector, include_slash)
     if mode_add:
         ret += ' add '+tag_id
     elif mode_remove:
@@ -325,7 +345,7 @@ def summon_rider(target_selector: str,
                  include_slash: bool = True) -> str:
     """If using nametag, you MUST include spawn_event\n
        For most mobs, spawn_event should be 'minecraft:entity_spawned'"""
-    ret = command_base('ride', target_selector, include_slash)
+    ret = _command_stem('ride', target_selector, include_slash)
     ret += ' summon_rider'
     ret += ' '+rider_type
     if spawn_event is not None:
@@ -338,11 +358,11 @@ def summon_rider(target_selector: str,
 def event(selector: str,
           event_name: str,
           include_slash: bool = True) -> str:
-    ret = command_base('event entity', selector, include_slash)
+    ret = _command_stem('event entity', selector, include_slash)
     ret += ' '+event_name
     return ret
 
 
 def kill(selector: str,
          include_slash: bool = True) -> str:
-    return command_base('kill', selector, include_slash)
+    return _command_stem('kill', selector, include_slash)
