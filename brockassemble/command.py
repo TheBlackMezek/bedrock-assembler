@@ -404,14 +404,41 @@ def effect(
     return ret
 
 
-def summon(entity_id: str,
-           name: str = None,
-           x: str = None,
-           y: str = None,
-           z: str = None,
-           spawn_event: str = None,
-           include_slash: bool = True):
-    """Make sure you provide coordinates if using spawn_event!"""
+def summon(
+        entity_id: str,
+        name: str = None,
+        x: str | float = None,
+        y: str | float = None,
+        z: str | float = None,
+        spawn_event: str = None,
+        include_slash: bool = True) -> str:
+    """
+    Creates a command to summon an entity.
+
+    Parameters
+    ----------
+    entity_id : str
+        The ID of the entity to be summoned.
+    x, y, z : str | float
+        The position to summon the entity at.
+        If not provided, the entity will be summoned at
+        the summoner's position.
+        If floats, will use absolute coordinates.
+        If strings, can use relative coordinates with tilde '~' notation.
+    spawn_event : str
+        The specific event to be called on the entity when it spawns.
+        If not provided, the Bedrock default is 'minecraft:entity_spawned'.
+        If you use spawn_event, you MUST also provide x, y, z.
+    include_slash : bool
+        Whether or not the command begins with a forward slash '/'. This is
+        necessary for some cases but will break others.
+
+    Returns
+    -------
+    str
+        A complete /summon command.
+        Example: '/summon pig ~10 ~ ~'
+    """
     ret = _command_stem('summon', entity_id, include_slash)
 
     if spawn_event is not None or name is None:
