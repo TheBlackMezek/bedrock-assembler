@@ -290,7 +290,7 @@ def tp(
     Parameters
     ----------
     victim_selector : str
-        A target selector for the entities to be teleported.
+        The target selector for the entities to be teleported.
     x, y, z : str | float
         Coordinates to teleport the victims to.
         If floats, will use absolute coordinates.
@@ -349,14 +349,49 @@ def tp(
     return ret
 
 
-def effect(selector: str,
-           effect: str = None,
-           duration: float = 1.0,
-           level: int = 1,
-           hide_particles: bool = False,
-           clear: bool = False,
-           include_slash: bool = True):
-    """If clear==True, all other parameters will be ignored"""
+def effect(
+        selector: str,
+        effect: str = None,
+        duration: float = 1.0,
+        level: int = 1,
+        hide_particles: bool = False,
+        clear: bool = False,
+        include_slash: bool = True) -> str:
+    """
+    Creates an effect command, which applies a potion effect to one
+    or more entities.
+
+    Parameters
+    ----------
+    selector : str
+        The target selector for the entities which will have the effect
+        applied to them.
+    effect : str
+        The ID of the potion effect to apply.
+    duration : float
+        How long the effect will last.
+        This will not do anything to instantaneous effects,
+        such as instant_health.
+    level : int
+        The intensity level of the effect.
+        How this is applied varies depending on the effect.
+    hide_particles : bool
+        If True, the swirly potion particles which normally are emitted by
+        an entity with a potion effect are not emitted.
+    clear : bool
+        If True, removes all potion effects from the entity.
+        Additionally, if True, the effect, duration, level, and hide_particles
+        parameters will be ignored.
+    include_slash : bool
+        Whether or not the command begins with a forward slash '/'. This is
+        necessary for some cases but will break others.
+    
+    Returns
+    -------
+    str
+        A complete /effect command.
+        Example: '/effect @s regeneration 60 5 true'.
+    """
     ret = _command_stem('effect', selector, include_slash)
     if clear:
         ret += ' clear'
