@@ -15,17 +15,17 @@ class Component:
     comp_type : str
     json_obj : dict
     """
-    comp_type: str = 'UNDEFINED_COMPONENT_TYPE'
-    """
-    The component type ID. Must be a valid type for the component system
-    you're using.
-    """
-    json_obj: dict = {}
-    """The JSON-writable body of the component."""
 
     def __init__(self, type: str, priority: int = None):
-        self.json_obj = {}
-        self.comp_type = type
+        self.json_obj: dict = {}
+        """The JSON-writable body of the component."""
+
+        self.comp_type: str = type
+        """
+        The component type ID. Must be a valid type for the component system
+        you're using.
+        """
+
         if priority is not None:
             self.json_obj['priority'] = priority
 
