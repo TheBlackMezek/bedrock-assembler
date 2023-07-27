@@ -456,14 +456,39 @@ def summon(
     return ret
 
 
-def tag(selector: str,
+def tag(
+        selector: str,
         tag_id: str = None,
         mode_add: bool = False,
         mode_remove: bool = False,
         mode_list: bool = False,
         include_slash: bool = True) -> str:
-    """Set EXACTLY ONE mode argument to True\n
-       tag_id will not be used if mode_list==True"""
+    """
+    Creates a command which adds, removes, or lists tags on an entity.
+    Set EXACTLY ONE mode_ parameter to True.
+
+    Parameters
+    ----------
+    selector : str
+        The target selector for the entities to operate upon.
+    tag_id : str
+        The tag to be added or removed. Has no effect if using mode_list.
+    mode_add : bool
+        If true, creates a command to add a tag to the target entities.
+    mode_remove : bool
+        If true, creates a command to remove a tag from the target entities.
+    mode_list : bool
+        If true, prints a list of all tags currently on the target entities.
+    include_slash : bool
+        Whether or not the command begins with a forward slash '/'. This is
+        necessary for some cases but will break others.
+    
+    Returns
+    -------
+    str
+        A complete /tag command.
+        Example: '/tag @e[r=10] add marked_for_explode'
+    """
     ret = _command_stem('tag', selector, include_slash)
     if mode_add:
         ret += ' add '+tag_id
