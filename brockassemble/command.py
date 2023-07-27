@@ -266,23 +266,66 @@ def execute(
     return ret
 
 
-def tp(victim_selector: str = None,
-       x: str = None,
-       y: str = None,
-       z: str = None,
-       target_selector: str = None,
-       x_rot: float = None,
-       y_rot: float = None,
-       facing_selector: str = None,
-       facing_x: str = None,
-       facing_y: str = None,
-       facing_z: str = None,
-       check_for_blocks: bool = False,
-       include_slash: bool = True) -> str:
-    """Must be supplied EITHER with target_selector or x y z\n
-       Use one at most of: y_rot & x_rot; facing_selector; facing_x y z\n
-       check_for_blocks checks if destination has only nonsolid blocks\n
-       All position arguments can also be floats"""
+def tp(
+        victim_selector: str = None,
+        x: str | float = None,
+        y: str | float = None,
+        z: str | float = None,
+        target_selector: str = None,
+        x_rot: float = None,
+        y_rot: float = None,
+        facing_selector: str = None,
+        facing_x: str | float = None,
+        facing_y: str | float = None,
+        facing_z: str | float = None,
+        check_for_blocks: bool = False,
+        include_slash: bool = True) -> str:
+    """
+    Creates a teleport command.
+
+    Use one at most of: y_rot & x_rot; facing_selector; facing_x y z\n
+    check_for_blocks checks if destination has only nonsolid blocks\n
+    All position arguments can also be floats
+
+    Parameters
+    ----------
+    victim_selector : str
+        A target selector for the entities to be teleported.
+    x, y, z : str | float
+        Coordinates to teleport the victims to.
+        If floats, will use absolute coordinates.
+        If strings, can use relative coordinates with tilde '~' notation.
+        INCOMPATIBLE with use of target_selector parameter.
+    target_selector : str
+        A target selector for the destination entity the victims will be
+        teleported to.
+        INCOMPATIBLE with use of x, y, z parameters.
+    x_rot, y_rot : float
+        The X and Y rotation victim entities will have after teleportation.
+        INCOMPATIBLE with use of facing_selector and
+        facing_x, _y, _z parameters.
+    facing_selector : str
+        Target selector for an entity the victims will turn to face after
+        teleportation.
+        INCOMPATIBLE with use of x_rot, y_rot, and facing_x, _y, _z parameters.
+    facing_x, facing_y, facing_z : str | float
+        Coordinates which the victim entities will face after teleportation.
+        If floats, will use absolute coordinates.
+        If strings, can use relative coordinates with tilde '~' notation.
+        INCOMPATIBLE with use of x_rot, y_rot, and facing_selector parameters.
+    check_for_blocks : bool
+        If true, victims will not be teleported if target position is inside a
+        solid block.
+    include_slash : bool
+        Whether or not the command begins with a forward slash '/'. This is
+        necessary for some cases but will break others.
+    
+    Returns
+    -------
+    str
+        A complete /tp command.
+        Example: '/tp @e[r=10] 23 56 998 facing ~ ~1 ~5 true'.
+    """
     ret = _command_stem('tp', include_slash=include_slash)
 
     if victim_selector is not None:
