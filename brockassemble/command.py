@@ -507,7 +507,7 @@ def summon_rider(
         nametag: str = None,
         include_slash: bool = True) -> str:
     """
-    Creates a command which summons a rider onto an entity.
+    Creates a command which summons a rider onto selected entities.
 
     Parameters
     ----------
@@ -542,9 +542,29 @@ def summon_rider(
     return ret
 
 
-def event(selector: str,
-          event_name: str,
-          include_slash: bool = True) -> str:
+def event(
+        selector: str,
+        event_name: str,
+        include_slash: bool = True) -> str:
+    """
+    Creates a command which calls an event on selected entities.
+
+    Parameters
+    ----------
+    selector : str
+        The target selector for the entities to call the event on.
+    event_name : str
+        The ID of the event to be called.
+    include_slash : bool
+        Whether or not the command begins with a forward slash '/'. This is
+        necessary for some cases but will break others.
+    
+    Returns
+    -------
+    str
+        A complete event command.
+        Example: '/event entity @e[type=myteam:jump_pad] myteam:activate_jump'
+    """
     ret = _command_stem('event entity', selector, include_slash)
     ret += ' '+event_name
     return ret
