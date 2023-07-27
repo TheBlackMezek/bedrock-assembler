@@ -500,13 +500,38 @@ def tag(
     return ret
 
 
-def summon_rider(target_selector: str,
-                 rider_type: str,
-                 spawn_event: str = None,
-                 nametag: str = None,
-                 include_slash: bool = True) -> str:
-    """If using nametag, you MUST include spawn_event\n
-       For most mobs, spawn_event should be 'minecraft:entity_spawned'"""
+def summon_rider(
+        target_selector: str,
+        rider_type: str,
+        spawn_event: str = None,
+        nametag: str = None,
+        include_slash: bool = True) -> str:
+    """
+    Creates a command which summons a rider onto an entity.
+
+    Parameters
+    ----------
+    target_selector : str
+        The target selector for the entities to summon riders on.
+    rider_type : str
+        The entity ID of the riders to be summoned.
+    spawn_event : str
+        The specific event to be called on the riders when they spawn.
+        If not provided, the Bedrock default is 'minecraft:entity_spawned'.
+    nametag : str
+        A name to be given to the summoned riders.
+        If you use the nametag parameter, you MUST also use spawn_event,
+        even if you're just using the default 'minecraft:entity_spawned'.
+    include_slash : bool
+        Whether or not the command begins with a forward slash '/'. This is
+        necessary for some cases but will break others.
+    
+    Returns
+    -------
+    str
+        A complete summon rider command.
+        Example: '/ride @e[type=boat,r=20] summon_rider pig'
+    """
     ret = _command_stem('ride', target_selector, include_slash)
     ret += ' summon_rider'
     ret += ' '+rider_type
