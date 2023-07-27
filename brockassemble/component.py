@@ -34,9 +34,12 @@ class Component:
         return 'minecraft:' + self.comp_type
 
 
-def component_family(families: list) -> Component:
-    """Creates a type_family component\n
-    families must be a list of strings"""
+def component_family(families: list[str]) -> Component:
+    """
+    Creates a type_family component.\n
+    type_family has no effects on its own, but can be used by filters to detect
+    certain types of entities.
+    """
     comp = Component('type_family')
     comp.json_obj['family'] = families
     return comp
