@@ -6,10 +6,22 @@ from typing import Union
 
 
 class Component:
-    '''Base class for any addon file which uses a component system\n
-    This includes entity behavior files and particles'''
-    comp_type = 'UNDEFINED_COMPONENT_TYPE'
-    json_obj = {}
+    """
+    Base class for any addon file which uses a component system.
+    This includes entity behavior files, item behavior files, and particles.
+
+    Attributes
+    ----------
+    comp_type : str
+    json_obj : dict
+    """
+    comp_type: str = 'UNDEFINED_COMPONENT_TYPE'
+    """
+    The component type ID. Must be a valid type for the component system
+    you're using.
+    """
+    json_obj: dict = {}
+    """The JSON-writable body of the component."""
 
     def __init__(self, type: str, priority: int = None):
         self.json_obj = {}
@@ -18,7 +30,7 @@ class Component:
             self.json_obj['priority'] = priority
 
     def get_id(self) -> str:
-        "This entity's type prefixed with the 'minecraft:' namespace"
+        """This entity's type prefixed with the 'minecraft:' namespace."""
         return 'minecraft:' + self.comp_type
 
 
