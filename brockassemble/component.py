@@ -35,16 +35,16 @@ class Component:
 
 
 def component_family(families: list) -> Component:
-    '''Creates a type_family component\n
-    families must be a list of strings'''
+    """Creates a type_family component\n
+    families must be a list of strings"""
     comp = Component('type_family')
     comp.json_obj['family'] = families
     return comp
 
 
 def component_timer(length: float, event: str) -> Component:
-    '''Creates a timer component\n
-    Keep in mind you can only have one active at a time in an entity'''
+    """Creates a timer component\n
+    Keep in mind you can only have one active at a time in an entity"""
     comp = Component('timer')
     comp.json_obj['randomInterval'] = False
     comp.json_obj['time'] = length
@@ -53,44 +53,44 @@ def component_timer(length: float, event: str) -> Component:
 
 
 def component_skin_id(skin_id: int) -> Component:
-    '''Creates a skin_id component\n
+    """Creates a skin_id component\n
     Useful for sending data between entity files, 
-    but consider using entity properties instead'''
+    but consider using entity properties instead"""
     comp = Component('skin_id')
     comp.json_obj['value'] = skin_id
     return comp
 
 
 def component_variant(variant: int) -> Component:
-    '''Creates a variant component\n
+    """Creates a variant component\n
     Useful for sending data between entity files, 
-    but consider using entity properties instead'''
+    but consider using entity properties instead"""
     comp = Component('variant')
     comp.json_obj['value'] = variant
     return comp
 
 
 def component_mark_variant(mark_variant: int) -> Component:
-    '''Creates a mark_variant component\n
+    """Creates a mark_variant component\n
     Useful for sending data between entity files, 
-    but consider using entity properties instead'''
+    but consider using entity properties instead"""
     comp = Component('mark_variant')
     comp.json_obj['value'] = mark_variant
     return comp
 
 
 def component_scale(scale: float) -> Component:
-    '''Creates a scale component\n
-    Changes the entity's visual size and hitbox'''
+    """Creates a scale component\n
+    Changes the entity's visual size and hitbox"""
     comp = Component('scale')
     comp.json_obj['value'] = scale
     return comp
 
 
 def component_movement(speed: float) -> Component:
-    '''Creates a movement component\n
+    """Creates a movement component\n
     This sets an entity's walkspeed, which can be further modified under 
-    certain conditions by other components.'''
+    certain conditions by other components."""
     comp = Component('movement')
     comp.json_obj['value'] = speed
     return comp
@@ -100,17 +100,17 @@ def component_stroll(
         speed: float = 1,
         priority: int = 5
     ) -> Component:
-    '''Creates a behavior.random_stroll component\n
-    Causes the entity to wander around randomly'''
+    """Creates a behavior.random_stroll component\n
+    Causes the entity to wander around randomly"""
     comp = Component('behavior.random_stroll', priority=priority)
     comp.json_obj['speed_multiplier'] = speed
     return comp
 
 
 def component_random_look(priority: int=8) -> Component:
-    '''Creates a behavior.random_look_around component\n
+    """Creates a behavior.random_look_around component\n
     Causes the entity to periodically rotate its head and body 
-    in a random direction'''
+    in a random direction"""
     return(Component('behavior.random_look_around', priority=priority))
 
 
@@ -119,12 +119,12 @@ def component_attack(
         effect_id: str = None,
         effect_duration: float = None
     ) -> Component:
-    '''Creates an attack \n
+    """Creates an attack \n
     Sets the properties of an entity's melee attack. 
     Does not set targeting or movement to make attacks actually happen.\n
     If dmg is a list, it must be 2 elements, a minimum and maximum.\n
     effect_id is the name of a potion effect to apply on hit.\n
-    effect_duration is the time in seconds that potion effect will last.'''
+    effect_duration is the time in seconds that potion effect will last."""
     comp = Component('attack')
     comp.json_obj['damage'] = dmg
     if effect_id is not None:
@@ -139,12 +139,12 @@ def component_melee_attack(
         track_target: bool = None,
         reach_multiplier: float = None
     ) -> Component:
-    '''Creates a behavior.melee_attack component\n
+    """Creates a behavior.melee_attack component\n
     speed_multiplier is applied to the entity's movement \n
     track_target allows the entity to track its target even if 
     it doesn't have sensing. If not supplied, Bedrock defaults it to False.\n
     reach_multiplier uses the base size of the entity, which I think means 
-    hitbox. If not supplied, Bedrock defaults it to 2.0.'''
+    hitbox. If not supplied, Bedrock defaults it to 2.0."""
     comp = Component('behavior.melee_attack')
     if speed_multiplier is not None:
         comp.json_obj['speed_multiplier'] = speed_multiplier
@@ -160,7 +160,7 @@ def component_ranged_attack(
         interval_min: int = 1.0,
         interval_max: int = 3.0
     ) -> Component:
-    '''Creates a behavior.ranged_attack component'''
+    """Creates a behavior.ranged_attack component"""
     comp = Component('behavior.ranged_attack')
     comp.json_obj = {
         "attack_radius": attack_range,
@@ -173,8 +173,8 @@ def component_ranged_attack(
 def component_area_attack(
         damage_range: float,
         dmg: int) -> Component:
-    '''Creates an area_attack component\n
-    This deals damage to every entity which comes within range'''
+    """Creates an area_attack component\n
+    This deals damage to every entity which comes within range"""
     comp = Component('area_attack')
     comp.json_obj['damage_range'] = damage_range
     comp.json_obj['damage_per_tick'] = dmg
@@ -239,9 +239,9 @@ def component_rideable(
         seat_positions: list[list[float]],
         family_types: list[str],
         pull_in_entities=False) -> Component:
-    '''Creates a rideable component\n
+    """Creates a rideable component\n
     seat_positions is a list of three-float lists, for example: 
-    [[0.0, 0.0, 0.0], [0.0, 0.5, 1.0]]'''
+    [[0.0, 0.0, 0.0], [0.0, 0.5, 1.0]]"""
     comp = Component('rideable')
     comp.json_obj['seat_count'] = len(seat_positions)
     comp.json_obj['family_types'] = family_types
@@ -259,14 +259,14 @@ def component_list_pathfinding(
         target_family: str,
         reached_event: str,
         sensor_range: float=3) -> list:
-    '''Returns a set of components which together make an entity walk 
+    """Returns a set of components which together make an entity walk 
     towards a designated point\n
     The target point must an entity with family target_family\n
     reached_event is the event which will be called upon reaching the target\n
     sensor_range is how far away the entity can be to 
     call reached_event\n
     The components returned are behavior.nearest_attackable_target, 
-    behavior.melee_attack, entity_sensor, and attack'''
+    behavior.melee_attack, entity_sensor, and attack"""
     nat = Component('behavior.nearest_attackable_target')
     nat.json_obj = {
         "priority": 0,
@@ -329,9 +329,9 @@ def component_no_knockback() -> Component:
 def component_shooter(
         projectile: str,
         potion_effect: int = -1) -> Component:
-    '''Creates a shooter component\n
+    """Creates a shooter component\n
     projectile is an entity ID\n
-    potion_effect is a vanilla ID number'''
+    potion_effect is a vanilla ID number"""
     comp = Component('shooter')
     comp.json_obj = {
         "def": projectile
@@ -344,8 +344,8 @@ def component_shooter(
 def tag_sensor(
         tag: str,
         event: str) -> Component:
-    '''Creates an environment_sensor component which waits for the entity to 
-    gain the tag passed in, and then calls event'''
+    """Creates an environment_sensor component which waits for the entity to 
+    gain the tag passed in, and then calls event"""
     comp = Component('environment_sensor')
     comp.json_obj = {
         "triggers": [
@@ -364,8 +364,8 @@ def tag_sensor(
 def tag_sensor_list(
         tags: list[str],
         events: list[str]) -> Component:
-    '''Creates an environment_sensor component which waits for the entity to 
-    gain any of the tags passed in, and then calls the corresponding event'''
+    """Creates an environment_sensor component which waits for the entity to 
+    gain any of the tags passed in, and then calls the corresponding event"""
     comp = Component('environment_sensor')
     comp.json_obj = {
         "triggers": []
