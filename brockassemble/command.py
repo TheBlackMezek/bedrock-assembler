@@ -198,18 +198,50 @@ def _command_stem(
     return ret
 
 
-def execute(cmd: str,
-            selector: str = None,
-            x: str = '~',
-            y: str = '~',
-            z: str = '~',
-            include_slash: bool = True,
-            detect_block: str = None,
-            detect_data_id: int = 0,
-            detect_x: str = '~',
-            detect_y: str = '~',
-            detect_z: str = '~') -> str:
-    """All position arguments can also be floats"""
+def execute(
+        cmd: str,
+        selector: str = None,
+        x: str | float = '~',
+        y: str | float = '~',
+        z: str | float = '~',
+        include_slash: bool = True,
+        detect_block: str = None,
+        detect_data_id: int = 0,
+        detect_x: str | float = '~',
+        detect_y: str | float = '~',
+        detect_z: str | float = '~') -> str:
+    """
+    Wraps a command inside of an execute command.
+
+    Parameters
+    ----------
+    cmd : str
+        The command which will be wrapped inside /execute.
+    selector : str
+        The target selector for this command.
+    x, y, z : str | float
+        The position to execute the command from.
+        If floats, will use absolute coordinates.
+        If strings, can use relative coordinates with tilde '~' notation.
+    include_slash : bool
+        Whether or not the command begins with a forward slash '/'. This is
+        necessary for some cases but will break others.
+    detect_block : str
+        The ID of a block which must be detected at the detection coordinates
+        for the command to execute.
+    detect_data_id : int
+        The additional data value of the block to be detected.
+    detect_x, detect_y, detect_z : str | float
+        The position at which to check for the block type.
+        If floats, will use absolute coordinates.
+        If strings, can use relative coordinates with tilde '~' notation.
+    
+    Returns
+    -------
+    str
+        A complete /execute command.
+        Example: '/execute @e[r=10] ~ ~ ~ summon pig'.
+    """
     ret = _command_stem('execute', selector, include_slash)
     ret += f' {x} {y} {z}'
     if detect_block is not None:
