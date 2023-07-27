@@ -34,7 +34,7 @@ class Item:
         the item ID.
         This should probably be the same as all other namespaces in your addon.
         """
-        self.name = name
+        self._name = name
         """
         The display name for this item type.
         If the id parameter is not used in __init__, name will be used to
@@ -58,24 +58,28 @@ class Item:
         else:
             self.identifier = name.lower().replace(' ', '_')
 
-        self.texture_name: str
+        self._texture_name: str
         """The file name of the inventory icon this item will use."""
         if texture_name != None:
-            self.texture_name = texture_name
+            self._texture_name = texture_name
         else:
-            self.texture_name = self.identifier
+            self._texture_name = self.identifier
         
         # Give the item type its inventory icon
         icon_comp = comp.Component('icon')
-        icon_comp.json_obj['texture'] = self.texture_name
+        icon_comp.json_obj['texture'] = self._texture_name
         self.components.append(icon_comp)
 
         # Give the item type its display name
         name_comp = comp.Component('display_name')
-        name_comp.json_obj['value'] = self.name
+        name_comp.json_obj['value'] = self._name
         self.components.append(name_comp)
     
-    def get_json(self):
+    def get_json(self) -> dict:
+        """
+        Compile this item type's components, events, and other attributes into
+        a dict ready for writing as an item's JSON behavior file.
+        """
         obj = {}
 
         obj['format_version'] = ITEM_BVR_FORMAT_VERSION
@@ -100,25 +104,40 @@ class Item:
 
         return obj
     
-    def set_texture(self, texid):
-        self.texture_name = texid
+    def set_texture(self, texid: str) -> None:
+        """
+        Set this item type's inventory icon. Make sure it points to a real
+        texture in your resource pack.
+        """
+        self._texture_name = texid
         icon_comp = comp.Component('icon')
-        icon_comp.json_obj['texture'] = self.texture_name
+        icon_comp.json_obj['texture'] = self._texture_name
         self.components[0] = icon_comp
 
-    def set_display_name(self, name):
-        self.name = name
+    def set_display_name(self, name: str) -> None:
+        """Set this item's display name."""
+        self._name = name
         name_comp = comp.Component('display_name')
-        name_comp.json_obj['value'] = self.name
+        name_comp.json_obj['value'] = self._name
         self.components[1] = name_comp
 
-    def add_on_use_command(self, command):
+    def add_on_use_command(self, command: str) -> None:
+        """
+        Add a command which the item will execute on "use"
+        (right click on desktop).
+        """
         comp = comp.Component('on_use')
         comp.json_obj['on_use'] = { 'event':'on_use', 'target':'self' }
         self.components.append(comp)
         event = comp.Component('on_use')
-        event.json_obj['run_command'] = { 'command':[command], 'target':'holder' }
+        event.json_obj['run_command'] = {
+            'command':[command], 'target':'holder'
+            }
         self.events.append(event)
 
-    def get_id(self):
+    def get_id(self) -> str:
+        """
+        Get the complete ID of this item type,
+        with both namespace and identifier
+        """
         return self.namespace + ':' + self.identifier
