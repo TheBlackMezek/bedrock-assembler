@@ -570,6 +570,24 @@ def event(
     return ret
 
 
-def kill(selector: str,
-         include_slash: bool = True) -> str:
+def kill(
+        selector: str,
+        include_slash: bool = True) -> str:
+    """
+    Creates a command which kills selected entities.
+
+    Parameters
+    ----------
+    selector : str
+        The target selector for the entities to be killed.
+    include_slash : bool
+        Whether or not the command begins with a forward slash '/'. This is
+        necessary for some cases but will break others.
+    
+    Returns
+    -------
+    str
+        A complete kill command.
+        Example: '/kill @e[type=pig,r=20]'
+    """
     return _command_stem('kill', selector, include_slash)
