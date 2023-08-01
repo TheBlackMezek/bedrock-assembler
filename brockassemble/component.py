@@ -39,6 +39,16 @@ def component_family(families: list[str]) -> Component:
     Creates a type_family component.\n
     type_family has no effects on its own, but can be used by filters to detect
     certain types of entities.
+
+    Parameters
+    ----------
+    families : list[str]
+        All of the families the entity will belong to.
+    
+    Returns
+    -------
+    Component
+        A type_family Component.
     """
     comp = Component('type_family')
     comp.json_obj['family'] = families
@@ -46,8 +56,22 @@ def component_family(families: list[str]) -> Component:
 
 
 def component_timer(length: float, event: str) -> Component:
-    """Creates a timer component\n
-    Keep in mind you can only have one active at a time in an entity"""
+    """
+    Creates a timer component.\n
+    There can only be one active timer component at once in an entity.
+
+    Parameters
+    ----------
+    length : float
+        Duration that the timer will run for.
+    event : str
+        The event to call in the entity when the timer runs out.
+    
+    Returns
+    -------
+    Component
+        A timer Component.
+    """
     comp = Component('timer')
     comp.json_obj['randomInterval'] = False
     comp.json_obj['time'] = length
@@ -56,78 +80,185 @@ def component_timer(length: float, event: str) -> Component:
 
 
 def component_skin_id(skin_id: int) -> Component:
-    """Creates a skin_id component\n
-    Useful for sending data between entity files, 
-    but consider using entity properties instead"""
+    """
+    Creates a skin_id component.\n
+    Skin_id is useful for sending data between entity files,
+    but entity properties are generally preferable.
+
+    Parameters
+    ----------
+    skin_id : int
+        The skin ID number.
+    
+    Returns
+    -------
+    Component
+        A skin_id Component.
+    """
     comp = Component('skin_id')
     comp.json_obj['value'] = skin_id
     return comp
 
 
 def component_variant(variant: int) -> Component:
-    """Creates a variant component\n
-    Useful for sending data between entity files, 
-    but consider using entity properties instead"""
+    """
+    Creates a variant component.\n
+    Variant is useful for sending data between entity files, 
+    but entity properties are generally preferable.
+
+    Parameters
+    ----------
+    variant : int
+        The variant ID number.
+    
+    Returns
+    -------
+    Component
+        A variant Component.
+    """
     comp = Component('variant')
     comp.json_obj['value'] = variant
     return comp
 
 
 def component_mark_variant(mark_variant: int) -> Component:
-    """Creates a mark_variant component\n
-    Useful for sending data between entity files, 
-    but consider using entity properties instead"""
+    """
+    Creates a mark_variant component.\n
+    Mark_variant is useful for sending data between entity files, 
+    but entity properties are generally preferable.
+
+    Parameters
+    ----------
+    mark_variant : int
+        The mark_variant ID number.
+    
+    Returns
+    -------
+    Component
+        A mark_variant Component.
+    """
     comp = Component('mark_variant')
     comp.json_obj['value'] = mark_variant
     return comp
 
 
 def component_scale(scale: float) -> Component:
-    """Creates a scale component\n
-    Changes the entity's visual size and hitbox"""
+    """
+    Creates a scale component.\n
+    Scale multiplies the entity's visual size and hitbox.
+    It can have some weird effects, so it's best to make the model at the
+    desired size to begin with, and to set the hitbox size directly.
+
+    Parameters
+    ----------
+    scale : float
+        The number to multiply the entity's visual size and hitbox by.
+    
+    Returns
+    -------
+    Component
+        A scale Component.
+    """
     comp = Component('scale')
     comp.json_obj['value'] = scale
     return comp
 
 
 def component_movement(speed: float) -> Component:
-    """Creates a movement component\n
-    This sets an entity's walkspeed, which can be further modified under 
-    certain conditions by other components."""
+    """
+    Creates a movement component.\n
+    This sets an entity's walkspeed, which can be further modified under
+    certain conditions by other components.
+
+    Parameters
+    ----------
+    speed : float
+        The walkspeed the entity will have.
+    
+    Returns
+    -------
+    Component
+        A movement Component.
+    """
     comp = Component('movement')
     comp.json_obj['value'] = speed
     return comp
 
 
 def component_stroll(
-        speed: float = 1,
+        speed: float = 1.0,
         priority: int = 5
     ) -> Component:
-    """Creates a behavior.random_stroll component\n
-    Causes the entity to wander around randomly"""
+    """
+    Creates a behavior.random_stroll component.\n
+    This behavior component causes the entity to wander around randomly.
+
+    Parameters
+    ----------
+    speed : float
+        A number to multiply the entity's default walkspeed by while wandering.
+    priority : int
+        The priority of this behavior in the entity compared to other
+        behaviors. Lower numbers are higher priority.
+    
+    Returns
+    -------
+    Component
+        A behavior.random_stroll Component.
+    """
     comp = Component('behavior.random_stroll', priority=priority)
     comp.json_obj['speed_multiplier'] = speed
     return comp
 
 
 def component_random_look(priority: int=8) -> Component:
-    """Creates a behavior.random_look_around component\n
-    Causes the entity to periodically rotate its head and body 
-    in a random direction"""
+    """
+    Creates a behavior.random_look_around component.\n
+    This behavior component causes the entity to periodically rotate its head
+    and body in a random direction.
+
+    Parameters
+    ----------
+    priority : int
+        The priority of this behavior in the entity compared to other
+        behaviors. Lower numbers are higher priority.
+    
+    Returns
+    -------
+    Component
+        A behavior.random_look_around Component.
+    """
     return(Component('behavior.random_look_around', priority=priority))
 
 
 def component_attack(
-        dmg: Union[int, list[int]],
+        dmg: int | list[int],
         effect_id: str = None,
         effect_duration: float = None
     ) -> Component:
-    """Creates an attack \n
-    Sets the properties of an entity's melee attack. 
-    Does not set targeting or movement to make attacks actually happen.\n
-    If dmg is a list, it must be 2 elements, a minimum and maximum.\n
-    effect_id is the name of a potion effect to apply on hit.\n
-    effect_duration is the time in seconds that potion effect will last."""
+    """
+    Creates an attack component.\n
+    This component sets the properties of an entity's melee attack. 
+    It does create targeting or movement to make attacks actually happen.\n
+
+    Parameters
+    ----------
+    dmg : int | list[int]
+        The amount of damage the entity does each attack. 1 damage is equal to
+        half a heart.
+        If using a list, the amount of damage will be random, where dmg[0] is
+        the minimum damage and dmg[1] is the maximum damage.
+    effect_id : str
+        The ID of a potion effect to apply to the target on hit.
+        effect_duration must also be given if you use effect_id.
+    effect_duration : float
+        The length of time the potion effect will last, in seconds.
+    
+    Returns
+    -------
+    Component
+        An attack Component.
+    """
     comp = Component('attack')
     comp.json_obj['damage'] = dmg
     if effect_id is not None:
@@ -142,12 +273,30 @@ def component_melee_attack(
         track_target: bool = None,
         reach_multiplier: float = None
     ) -> Component:
-    """Creates a behavior.melee_attack component\n
-    speed_multiplier is applied to the entity's movement \n
-    track_target allows the entity to track its target even if 
-    it doesn't have sensing. If not supplied, Bedrock defaults it to False.\n
-    reach_multiplier uses the base size of the entity, which I think means 
-    hitbox. If not supplied, Bedrock defaults it to 2.0."""
+    """
+    Creates a behavior.melee_attack component.\n
+    This component causes the entity to move towards its target and do melee
+    attacks. The entity must also have an "attack" component to define stats
+    like melee damage, and a targeting component such as
+    behavior.nearest_attackable_target.
+
+    Parameters
+    ----------
+    speed_multiplier : float
+        A number to multiply the entity's default walkspeed by while moving
+        to attack.
+    track_target : bool
+        If true, allows the entity to track its target even if it doesn't have
+        any sensing.
+    reach_multiplier : float
+        The melee attack range, muliplied from the entity's base size. If not
+        supplied, the Bedrock default value is 2.0.
+    
+    Returns
+    -------
+    Component
+        A behavior.melee_attack Component.
+    """
     comp = Component('behavior.melee_attack')
     if speed_multiplier is not None:
         comp.json_obj['speed_multiplier'] = speed_multiplier
@@ -159,11 +308,31 @@ def component_melee_attack(
 
 
 def component_ranged_attack(
-        attack_range: int = 15.0,
-        interval_min: int = 1.0,
-        interval_max: int = 3.0
+        attack_range: float = 15.0,
+        interval_min: float = 1.0,
+        interval_max: float = 3.0
     ) -> Component:
-    """Creates a behavior.ranged_attack component"""
+    """
+    Creates a behavior.ranged_attack component.\n
+    This component causes the entity to approach its target and shoot
+    projectiles at them.
+
+    Parameters
+    ----------
+    attack_range : float
+        The minimum distance between the entity and its target before the
+        entity will shoot. When beyond this range, the entity will try to
+        get close to its target.
+    interval_min : float
+        Minimum time between shots. Randomized between interval_max.
+    interval_max : float
+        Maximum time between shots. Randomized between interval_min.
+    
+    Returns
+    -------
+    Component
+        A behavior.ranged_attack Component.
+    """
     comp = Component('behavior.ranged_attack')
     comp.json_obj = {
         "attack_radius": attack_range,
@@ -174,18 +343,46 @@ def component_ranged_attack(
 
 
 def component_area_attack(
-        damage_range: float,
-        dmg: int) -> Component:
-    """Creates an area_attack component\n
-    This deals damage to every entity which comes within range"""
+        range: float,
+        dmg: int
+    ) -> Component:
+    """
+    Creates an area_attack component.\n
+    This component deals damage to every entity within range every tick.
+
+    Parameters
+    ----------
+    range : float
+        The maximum range of the attack.
+    dmg : int
+        How much damage is done every tick. 1 point is 1/2 heart.
+
+    Returns
+    -------
+    Component
+        An area_attack Component.
+    """
     comp = Component('area_attack')
-    comp.json_obj['damage_range'] = damage_range
+    comp.json_obj['damage_range'] = range
     comp.json_obj['damage_per_tick'] = dmg
     return comp
 
 
 def component_health(max_hp: int):
-    'Creates a health component'
+    """
+    Creates a health component.\n
+    This sets the entity's max health. It is necessary for most mobs.
+    
+    Parameters
+    ----------
+    max_hp : int
+        The entity's maximum health. 1 point is 1/2 heart.
+    
+    Returns
+    -------
+    Component
+        A health Component.
+    """
     comp = Component('health')
     comp.json_obj['max'] = max_hp
     comp.json_obj['value'] = max_hp
@@ -195,7 +392,22 @@ def component_health(max_hp: int):
 def component_collision_box(
         width: float,
         height: float) -> Component:
-    'Creates a collision box component'
+    """
+    Creates a collision box component.\n
+    This sets the entity's collision box. It is necessary for most mobs.
+
+    Parameters
+    ----------
+    width : float
+        The width of the collision box. This is for both horizontal axes.
+    height : float
+        The height of the collision box.
+
+    Returns
+    -------
+    Component
+        A collision_box Component.
+    """
     comp = Component('collision_box')
     comp.json_obj['width'] = width
     comp.json_obj['height'] = height
@@ -203,7 +415,20 @@ def component_collision_box(
 
 
 def component_follow_range(rng: float) -> Component:
-    'Creates a follow_range component'
+    """
+    Creates a follow_range component.\n
+    This component sets how far away the entity will pursue its target.
+
+    Parameters
+    ----------
+    rng : float
+        The maximum range at which the entity will pursue its target.
+
+    Returns
+    -------
+    Component
+        A follow_range Component.
+    """
     comp = Component('follow_range')
     comp.json_obj['value'] = rng
     comp.json_obj['max'] = rng
@@ -383,4 +608,3 @@ def tag_sensor_list(
         }
         comp.json_obj['triggers'].append(obj)
     return comp
-
