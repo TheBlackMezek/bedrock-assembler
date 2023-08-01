@@ -198,8 +198,7 @@ class AnimTimelineItem:
     def __init__(
             self,
             trigger_time: float = None,
-            commands: list[str] = []
-        ) -> None:
+            commands: list[str] = []):
         self.trigger_time: float = trigger_time
         """The time in seconds when this timeline item will trigger."""
         self.commands: list[str] = commands
@@ -266,8 +265,7 @@ class Animation:
             identifier: str,
             looping: bool = False,
             length: float = None,
-            timeline_items: list = None
-        ) -> None:
+            timeline_items: list = None):
         self.identifier: str = identifier
         """The unique ID for this animation."""
         self.looping: bool = looping
@@ -336,7 +334,7 @@ class AnimationFile:
     format_version : str
     animations: list[Animation]
     """
-    def __init__(self, animations: list = []) -> None:
+    def __init__(self, animations: list[Animation] = []):
         self.format_version: str = "1.8.0"
         """The format version for Bedrock to use when reading this file."""
         self.animations: list[Animation] = animations
@@ -385,8 +383,11 @@ class AnimationFile:
 
 class AncoState:
     """
-    Class which stores data and generates a JSON dict for an
-    animation controller state
+    Class which represents an animation controller state.
+
+    Attributes
+    ----------
+    identifier : str
     """
     def __init__(
             self,
@@ -396,12 +397,8 @@ class AncoState:
             transitions: list[list[str]]=None,
             animations: list[str]=None,
             transition_time: float=None):
-        """
-        transntions is a list of 2-element lists. 
-        t[n][0] = state_id, t[n][1] = condition_string
-        """
         self.identifier = identifier
-        'Name of the anco state'
+        """ID of the anco state, must be unique within the anco."""
         self._transitions = []
         """
         A list of two-element lists, where subelement 1 is the state to
@@ -414,20 +411,20 @@ class AncoState:
         """
         self._on_entry = []
         """
-        A list of commands to execute when the state is entered\n
-        Each command must include a forward slash / prefix
+        A list of commands to execute when the state is entered.\n
+        Each command must include a forward slash / prefix.
         """
         self._on_exit = []
         """
-        A list of commands to execute when the state is exited\n
-        Each command must include a forward slash / prefix
+        A list of commands to execute when the state is exited.\n
+        Each command must include a forward slash / prefix.
         """
         self._animations = []
-        """A list of animations to play while in this state"""
+        """A list of animations to play while in this state."""
         self._transition_time = transition_time
         """
         Time in seconds during which animations from this state will blend
-        with animations in the next state
+        with animations in the next state.
         """
 
         if entry_commands is not None:
@@ -441,8 +438,13 @@ class AncoState:
 
     def get_json(self) -> dict:
         """
-        Builds a JSON-ready dict of this anco state which can be used in a 
-        Bedrock behavior pack animation controller
+        Builds a JSON-ready dict of this anco state which can be used in an 
+        animation controller.
+
+        Returns
+        -------
+        dict
+            A JSON-ready object representing this animation controller state.
         """
         obj = {}
 
@@ -468,51 +470,105 @@ class AncoState:
 
     def add_entry_commands(self, cmd_list: list[str]) -> None:
         """
-        Adds a list of commands to execute when the state is entered\n
-        Each command must include a forward slash / prefix
+        Adds a list of commands to execute when the state is entered.\n
+
+        Parameters
+        ----------
+        cmd_list : list[str]
+            The list of commands to execute.
+            Each command must include a forward slash / prefix.
         """
         for i in cmd_list:
             self._on_entry.append(i)
 
     def add_entry_command(self, cmd: str) -> None:
         """
-        Adds a command to execute when the state is entered\n
-        The command must include a forward slash / prefix
+        Adds a command to execute when the state is entered.\n
+
+        Parameters
+        ----------
+        cmd : str
+            The command to execute.
+            The command must include a forward slash / prefix.
         """
         self._on_entry.append(cmd)
 
     def add_exit_commands(self, cmd_list: list[str]) -> None:
         """
-        Adds a list of commands to execute when the state is exited\n
-        Each command must include a forward slash / prefix
+        Adds a list of commands to execute when the state is exited.\n
+
+        Parameters
+        ----------
+        cmd_list : list[str]
+            The list of commands to execute.
+            Each command must include a forward slash / prefix.
         """
         for i in cmd_list:
             self._on_exit.append(i)
 
     def add_exit_command(self, cmd: str) -> None:
         """
-        Adds a command to execute when the state is exited\n
-        The command must include a forward slash / prefix
+        Adds a command to execute when the state is exited.\n
+
+        Parameters
+        ----------
+        cmd : str
+            The command to execute.
+            The command must include a forward slash / prefix.
         """
         self._on_exit.append(cmd)
 
     def add_animations(self, anim_list: list[str]) -> None:
-        """Adds a list of animations to play while in this state"""
+        """
+        Adds a list of animations to play while in this state.
+
+        Parameters
+        ----------
+        anim_list : list[str]
+            The list the IDs of animation to play.
+        """
         for i in anim_list:
             self._animations.append(i)
 
     def add_animation(self, anim: str) -> None:
-        """Adds an animation to play while in this state"""
+        """
+        Adds an animation to play while in this state
+
+        Parameters
+        ----------
+        anim : str
+            The ID of the animation to play.
+        """
         self._animations.append(anim)
 
-    def add_transitions(self, lst):
-        """lst is a list of 2-element lists. 
-        lst[n][0] = state_id, lst[n][1] = condition_string"""
+    def add_transitions(self, lst: list[list[str]]):
+        """
+        Adds a list of transitions from this state to others.
+
+        Parameters
+        ----------
+        lst : list[list[str]]
+            lst is a list of 2-element lists. 
+            lst[n][0] = state_id, lst[n][1] = condition_string\n
+            Example: [
+                ['init', 'query.all_animations_finished'],\n
+                ['dead', 'query.health <= 0']
+            ]
+        """
         for i in lst:
             self._transitions.append([i[0], i[1]])
 
     def add_transition(self, state_id: str, condition_string: str) -> None:
-        """Adds a condition to transition into another state"""
+        """
+        Adds a transition into another state.
+
+        Parameters
+        ----------
+        state_id : str
+            The state to transition into.
+        condition_string : str
+            The condition under which to make the transition.
+        """
         self._transitions.append([state_id, condition_string])
 
 
