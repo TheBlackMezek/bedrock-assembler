@@ -187,19 +187,61 @@ def replace_obj_string_variables(
 
 
 class AnimTimelineItem:
-    def __init__(self,
-                 trigger_time: float = None,
-                 commands: list = []) -> None:
+    """
+    Class which represents one point on an animation timeline.
+
+    Attributes
+    ----------
+    trigger_time : float
+    commands : list[str]
+    """
+    def __init__(
+            self,
+            trigger_time: float = None,
+            commands: list[str] = []
+        ) -> None:
         self.trigger_time: float = trigger_time
-        self.commands: list = commands
+        """The time in seconds when this timeline item will trigger."""
+        self.commands: list[str] = commands
+        """
+        A list of commands which will be run at this point in the timeline.
+        Note that this only works for behavior pack animations.
+        """
 
     def add_command(self, cmd: str) -> None:
+        """
+        Adds a command which will be run when this timeline item is triggered.
+
+        Parameters
+        ----------
+        cmd : str
+            The command which will be run.
+        """
         self.commands.append(cmd)
 
-    def add_commands(self, cmds: list) -> None:
+    def add_commands(self, cmds: list[str]) -> None:
+        """
+        Adds a list of commands which will be run when this timeline 
+        item is triggered.
+
+        Parameters
+        ----------
+        cmds : list[str]
+            The commands which will be run.
+        """
         self.commands.extend(cmds)
 
-    def get_json(self) -> None:
+    def get_json(self) -> list[str] | str:
+        """
+        Compile this timeline item's attributes into
+        data ready for writing into an animation's JSON file.
+
+        Returns
+        -------
+        list[str] | str
+            Returns a string if there is only one command.
+            Otherwise, returns the list of all commands.
+        """
         if len(self.commands) == 1:
             return self.commands[0]
         else:
