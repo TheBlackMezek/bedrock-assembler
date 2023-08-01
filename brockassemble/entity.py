@@ -249,26 +249,67 @@ class AnimTimelineItem:
 
 
 class Animation:
-    def __init__(self,
-                 identifier: str,
-                 looping: bool = False,
-                 length: float = None,
-                 timeline_items: list = None) -> None:
+    """
+    Class which represents an animation.
+
+    Attributes
+    ----------
+    identifier : str
+    looping : bool
+    length : float
+    timeline_items : list[AnimTimelineItem]
+    """
+    def __init__(
+            self,
+            identifier: str,
+            looping: bool = False,
+            length: float = None,
+            timeline_items: list = None
+        ) -> None:
         self.identifier: str = identifier
+        """The unique ID for this animation."""
         self.looping: bool = looping
-        self.length = length
+        """Whether this animation should loop when it finishes."""
+        self.length: float = length
+        """Duration of this animation in seconds."""
+        self.timeline_items: list[AnimTimelineItem]
+        """All of the timeline items, or keyframes, in this animation."""
         if timeline_items is None:
             self.timeline_items = []
         else:
             self.timeline_items = timeline_items
 
     def add_timeline_item(self, item: AnimTimelineItem) -> None:
+        """
+        Adds a timeline item to this animation.
+
+        Parameters
+        ----------
+        item : AnimTimelineItem
+            The timeline item to be added.
+        """
         self.timeline_items.append(item)
 
-    def add_timeline_items(self, items: list) -> None:
+    def add_timeline_items(self, items: list[AnimTimelineItem]) -> None:
+        """
+        Adds a list of timeline items to this animation.
+
+        Parameters
+        ----------
+        items : list[AnimTimelineItem]
+            The list of timeline items to be added.
+        """
         self.timeline_items.extend(items)
 
     def get_json(self) -> dict:
+        """
+        Compile this animation into a dict ready for writing into a JSON file.
+
+        Returns
+        -------
+        dict
+            A JSON-ready object representing this animation.
+        """
         obj = {}
 
         if self.looping:
