@@ -25,17 +25,20 @@ ENTITY_GRAPHICS_FORMAT_VERSION = '1.10.0'
 
 def basic_rp_entity(id: str, namespace: str) -> dict:
     """
-    Creates a barebones JSON dict for an invisible entity rsc file.
+    Creates a barebones JSON dict for an invisible entity resource file.
 
-    Args:
-        id (`str`):
-            Unique identifier for this entity. Should be lower case.
-        namespace (`str`):
-            Grouping prefix for this entity. Should be lower case. Can be any
-            text you like, but use of the name of the team which is making the
-            map or addon is recommended.
+    Parameters
+    ----------
+    id : str
+        Unique identifier for this entity. Should be lower case.
+    namespace : str
+        Grouping prefix for this entity. Should be lower case. Can be any
+        text you like, but use of the name of the team which is making the
+        map or addon is recommended.
 
-    Return (`dict`):
+    Returns
+    -------
+    dict
         The JSON (stored as a dict) for a barebones client entity file. It will
         not render in the game, and it will use a black and magenta spawn egg
         (missing texture colors) to indicate that no entity-specific colors
@@ -56,17 +59,20 @@ def basic_rp_entity(id: str, namespace: str) -> dict:
 
 def basic_bp_entity(id: str, namespace: str) -> dict:
     """
-    Creates a barebones JSON dict for an entity bvr file.
+    Creates a barebones JSON dict for an entity behavior file.
 
-    Args:
-        id (`str`):
-            Unique identifier for this entity. Should be lower case.
-        namespace (`str`):
-            Grouping prefix for this entity. Should be lower case. Can be any
-            text you like, but use of the name of the team which is making the
-            map or addon is recommended.
+    Parameters
+    ----------
+    id : str
+        Unique identifier for this entity. Should be lower case.
+    namespace : str
+        Grouping prefix for this entity. Should be lower case. Can be any
+        text you like, but use of the name of the team which is making the
+        map or addon is recommended.
 
-    Return (`dict`):
+    Returns
+    -------
+    dict
         The JSON (stored as a dict) for a barebones server entity file. It will
         be summonable with commands and have a spawn egg. It will not be able
         to use experimental components. Empty dicts for entity components,
@@ -93,11 +99,12 @@ def basic_bp_entity(id: str, namespace: str) -> dict:
     return entity
 
 
-def replace_list_string_variables(
+def _replace_list_string_variables(
         lst: list,
-        string_variables: dict) -> None:
+        string_variables: dict
+    ) -> None:
     """
-    Loop through all dict values and list elements in obj and replace every 
+    Loops through all dict values and list elements in lst and replace every 
     substring which matches a string_variables key prepended with % with the 
     corresponding string_variables value.
 
@@ -109,6 +116,19 @@ def replace_list_string_variables(
 
     For example, {'damage': 5} would replace '%damage' with 5, but 
     'My damage is %damage' will produce an error.
+
+    Parameters
+    ----------
+    list : list
+        The list to recursively loop through. Only str values will be modified.
+    string_variables : dict
+        The string variable patterns to match and replace. See above for
+        instructions.
+    
+    Returns
+    -------
+    None
+        Changes to lst are done in-place.
     """
     for i in range(0,len(lst)):
         for s in string_variables:
@@ -120,7 +140,7 @@ def replace_list_string_variables(
         if type(lst[i]) == dict:
             replace_obj_string_variables(lst[i], string_variables)
         if type(lst[i]) == list:
-            replace_list_string_variables(lst[i], string_variables)
+            _replace_list_string_variables(lst[i], string_variables)
 
 
 def replace_obj_string_variables(
@@ -139,6 +159,19 @@ def replace_obj_string_variables(
 
     For example, {'damage': 5} would replace '%damage' with 5, but 
     'My damage is %damage' will produce an error.
+
+    Parameters
+    ----------
+    obj : dict
+        The dict to recursively loop through. Only str values will be modified.
+    string_variables : dict
+        The string variable patterns to match and replace. See above for
+        instructions.
+    
+    Returns
+    -------
+    None
+        Changes to obj are done in-place.
     """
     for i in obj:
         for s in string_variables:
@@ -150,7 +183,7 @@ def replace_obj_string_variables(
         if type(obj[i]) == dict:
             replace_obj_string_variables(obj[i], string_variables)
         if type(obj[i]) == list:
-            replace_list_string_variables(obj[i], string_variables)
+            _replace_list_string_variables(obj[i], string_variables)
 
 
 class AnimTimelineItem:
