@@ -251,6 +251,8 @@ class AnimTimelineItem:
 class Animation:
     """
     Class which represents an animation.
+    Note that this represents a single animation, and must be added to an
+    AnimationFile object for writing to file.
 
     Attributes
     ----------
@@ -326,17 +328,51 @@ class Animation:
 
 
 class AnimationFile:
+    """
+    Class which represents a set of animations in a file.
+
+    Attributes
+    ----------
+    format_version : str
+    animations: list[Animation]
+    """
     def __init__(self, animations: list = []) -> None:
         self.format_version: str = "1.8.0"
-        self.animations: list = animations
+        """The format version for Bedrock to use when reading this file."""
+        self.animations: list[Animation] = animations
+        """The list of animations contained in this file."""
 
     def add_anim(self, anim: Animation) -> None:
+        """
+        Adds an animation to this file.
+
+        Parameters
+        ----------
+        anim : Animation
+            The animation to be added.
+        """
         self.animations.append(anim)
 
-    def add_anims(self, anims: list) -> None:
+    def add_anims(self, anims: list[Animation]) -> None:
+        """
+        Adds a list of animations to this file.
+
+        Parameters
+        ----------
+        anims : list[Animation]
+            The list of animations to be added.
+        """
         self.animations.extend(anims)
 
     def get_json(self) -> dict:
+        """
+        Compile this object into a dict ready for writing as a JSON animation file.
+
+        Returns
+        -------
+        dict
+            A JSON-ready object representing this set of animations.
+        """
         obj = {}
 
         obj['format_version'] = self.format_version
