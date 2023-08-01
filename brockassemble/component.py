@@ -391,7 +391,8 @@ def component_health(max_hp: int):
 
 def component_collision_box(
         width: float,
-        height: float) -> Component:
+        height: float
+    ) -> Component:
     """
     Creates a collision box component.\n
     This sets the entity's collision box. It is necessary for most mobs.
@@ -436,7 +437,15 @@ def component_follow_range(rng: float) -> Component:
 
 
 def component_no_dmg() -> Component:
-    'Creates a damage_sensor component with all damage disabled'
+    """
+    Creates a damage_sensor component with all damage disabled.
+    Note that an entity with this component can killed with the /kill command.
+
+    Returns
+    -------
+    Component
+        A damage_sensor Component which blocks all damage.
+    """
     comp = Component('damage_sensor')
     comp.json_obj['triggers'] = {
         'on_damage': {
@@ -452,8 +461,32 @@ def component_nav_generic(
         avoid_water: bool = True,
         can_pass_doors: bool = True,
         can_open_doors: bool = False,
-        avoid_damage_blocks: bool = True) -> Component:
-    'Creates a navigation.generic component'
+        avoid_damage_blocks: bool = True
+    ) -> Component:
+    """
+    Creates a navigation.generic component.\n
+    This component allows the entity to pathfind walking, swimming, flying,
+    jumping, and/or climbing paths. Various parameters determine what it can
+    and can't do.
+
+    Parameters
+    ----------
+    can_path_over_water : bool
+        If true, the entity can generate paths over the surface of water.
+    avoid_water : bool
+        If true, the entity will avoid water.
+    can_pass_doors : bool
+        If true, the entity can generate paths which go through doors.
+    can_open_doors : bool
+        If true, the entity can generate paths which go through closed doors.
+    avoid_damage_blocks : bool
+        If true, the entity will avoid blocks which cause damage.
+    
+    Returns
+    -------
+    Component
+        A navigation.generic Component.
+    """
     comp = Component('navigation.generic')
     comp.json_obj['can_path_over_water'] = can_path_over_water
     comp.json_obj['avoid_water'] = avoid_water
@@ -466,10 +499,32 @@ def component_nav_generic(
 def component_rideable(
         seat_positions: list[list[float]],
         family_types: list[str],
-        pull_in_entities=False) -> Component:
-    """Creates a rideable component\n
-    seat_positions is a list of three-float lists, for example: 
-    [[0.0, 0.0, 0.0], [0.0, 0.5, 1.0]]"""
+        pull_in_entities: bool = False
+    ) -> Component:
+    """
+    Creates a rideable component.\n
+    This component allows other entities to ride on this one, with uses ranging
+    from creating mounts like horses to being able to attach invisible utility
+    entities.
+
+    Parameters
+    ----------
+    seat_positions : list[list[float]]
+        The set of seats on this entity. Each seat is defined by its position
+        within the entity, relative to the entity's "feet".
+        seat_positions is a list of three-float lists, representing coordinates.
+        For example: [[0.0, 0.0, 0.0], [0.0, 0.5, 1.0]]
+    family_types : list[str]
+        The entity families which are allowed to ride this entity.
+    pull_in_entities : bool
+        If true, this entity will cause valid riders to enter an open seat
+        if they touch.
+    
+    Returns
+    -------
+    Component
+        A ridable Component.
+    """
     comp = Component('rideable')
     comp.json_obj['seat_count'] = len(seat_positions)
     comp.json_obj['family_types'] = family_types
@@ -486,15 +541,32 @@ def component_rideable(
 def component_list_pathfinding(
         target_family: str,
         reached_event: str,
-        sensor_range: float=3) -> list:
-    """Returns a set of components which together make an entity walk 
-    towards a designated point\n
-    The target point must an entity with family target_family\n
-    reached_event is the event which will be called upon reaching the target\n
-    sensor_range is how far away the entity can be to 
-    call reached_event\n
-    The components returned are behavior.nearest_attackable_target, 
-    behavior.melee_attack, entity_sensor, and attack"""
+        sensor_range: float = 3
+    ) -> list[Component]:
+    """
+    Creates a set of Components which together make an entity walk 
+    towards a designated point.\n
+    The target point must an entity with family target_family.\n
+
+    Parameters
+    ----------
+    target_family : str
+        The family ID of the pathfinding target. It's generally a good idea to
+        make this unique for each pathfinding target so there's no possibility
+        of the pathfinder getting confused.
+    reached_event : str
+        The event which will be called in the pathfinder upon reaching
+        the target.
+    sensor_range : float
+        The maximum distance from the pathfinding target at which reached_event
+        will be called.
+    
+    Returns
+    -------
+    list[Component]
+        The Components returned are behavior.nearest_attackable_target, 
+        behavior.melee_attack, entity_sensor, and attack.
+    """
     nat = Component('behavior.nearest_attackable_target')
     nat.json_obj = {
         "priority": 0,
@@ -546,7 +618,14 @@ def component_list_pathfinding(
 
 
 def component_no_knockback() -> Component:
-    'Creates a knockback_resistance component with maximum resistance'
+    """
+    Creates a knockback_resistance component with maximum resistance.
+
+    Returns
+    -------
+    Component
+        A knockback_resistance Component with maximum value.
+    """
     comp = Component('knockback_resistance')
     comp.json_obj = {
         "value": 1.0
@@ -556,24 +635,58 @@ def component_no_knockback() -> Component:
 
 def component_shooter(
         projectile: str,
-        potion_effect: int = -1) -> Component:
-    """Creates a shooter component\n
-    projectile is an entity ID\n
-    potion_effect is a vanilla ID number"""
+        potion_effect: int = None
+    ) -> Component:
+    """
+    Creates a shooter component.\n
+    This component determines what kind of projectile an entity can shoot,
+    as well as some other settings. Making an entity shoot requires the
+    additional use of behavior.ranged_attack and at least one targeting
+    component.
+
+    Parameters
+    ----------
+    projectile : str
+        The entity ID of the projectile to be used.
+    potion_effect : int
+        Numerical ID of a potion effect the projectile will apply on hit.
+
+    Returns
+    -------
+    Component
+        A shooter Component.
+    """
     comp = Component('shooter')
     comp.json_obj = {
         "def": projectile
     }
-    if potion_effect != -1:
+    if potion_effect is not None:
         comp.json_obj['aux_val'] = potion_effect
     return comp
 
 
 def tag_sensor(
         tag: str,
-        event: str) -> Component:
-    """Creates an environment_sensor component which waits for the entity to 
-    gain the tag passed in, and then calls event"""
+        event: str
+    ) -> Component:
+    """
+    Creates an environment_sensor component which waits for the entity to 
+    gain a specific tag, and then calls an event.\n
+    For a sensor which can detect a variety of tags, use tag_sensor_list().
+
+    Parameters
+    ----------
+    tag : str
+        The tag which, when applied to this entity, will trigger the event.
+    event : str
+        The event which will be called.
+
+    Returns
+    -------
+    Component
+        An environment_sensor Component which detects a specific tag being
+        applied to the entity.
+    """
     comp = Component('environment_sensor')
     comp.json_obj = {
         "triggers": [
@@ -591,9 +704,27 @@ def tag_sensor(
 
 def tag_sensor_list(
         tags: list[str],
-        events: list[str]) -> Component:
-    """Creates an environment_sensor component which waits for the entity to 
-    gain any of the tags passed in, and then calls the corresponding event"""
+        events: list[str]
+    ) -> Component:
+    """
+    Creates an environment_sensor component which waits for the entity to 
+    gain any of a set of tags, and then calls the corresponding event.
+
+    Parameters
+    ----------
+    tags : list[str]
+        A list of tags which, when applied to this entity, will trigger the
+        event name in at the same position in the events parameter.
+    events : list[str]
+        The list of events which will be called when the tag in the
+        corresponding position of the tags list is added to the entity.
+    
+    Returns
+    -------
+    Component
+        An environment_sensor Component which detects when any of a set of tags
+        are applied to the entity and calls a corresponding event.
+    """
     comp = Component('environment_sensor')
     comp.json_obj = {
         "triggers": []
