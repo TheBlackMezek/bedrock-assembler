@@ -631,19 +631,46 @@ class EventRandomizer:
     """
     Class which represents an event randomization option.
     """
-    def __init__(self,
-                 weight: int = 1,
-                 add_groups: list = None,
-                 remove_groups: list = None,
-                 set_properties: dict = None):
+    def __init__(
+            self,
+            weight: int = 1,
+            add_groups: list[str] = None,
+            remove_groups: list[str] = None,
+            set_properties: dict = None):
+        """
+        Parameters
+        ----------
+        weight : int
+            The weight of this randomizer option against others in the event.
+            This is best thought of like entering a number of tickets into a
+            raffle. If randomizer A has weight 1 and randomizer B has weight 1,
+            there's a 50/50 chance of picking either. But if B has weight 2,
+            there is now a 33/66 chance.
+        add_groups : list[str]
+            Component group IDs to add if
+            this randomization option is chosen.
+        remove_groups : list[str]
+            Component group IDs to remove if
+            this randomization option is chosen.
+        set_properties : dict
+            Dict of entity properties to set if this randomization option is 
+            chosen. Each key is an entity property ID, and each value is what
+            that property will be set to.
+        """
         self._weight = weight
-        """The weight of this randomizer option against others in the event"""
+        """
+        The weight of this randomizer option against others in the event.
+        This is best thought of like entering a number of tickets into a
+        raffle. If randomizer A has weight 1 and randomizer B has weight 1,
+        there's a 50/50 chance of picking either. But if B has weight 2,
+        there is now a 33/66 chance.
+        """
         self._add_groups = add_groups
-        """Component group IDs to add if this randomization option is chosen"""
+        """Component group IDs to add if this randomization option is chosen."""
         self._remove_groups = remove_groups
         """
-        Component group IDs to remove if this randomization option 
-        is chosen
+        Component group IDs to remove if
+        this randomization option is chosen.
         """
         self._set_properties = set_properties
         """
@@ -652,10 +679,15 @@ class EventRandomizer:
         property will be set to.
         """
 
-    def get_json(self):
+    def get_json(self) -> dict:
         """
-        Builds a JSON-ready dict of this event which can be used in a 
-        Bedrock behavior pack event
+        Builds a JSON-ready dict of this randomizer option which can be used in
+        an event.
+
+        Returns
+        -------
+        dict
+            A JSON-ready object representing this event randomizer option.
         """
         obj = {}
         obj['weight'] = self._weight
