@@ -199,6 +199,16 @@ class AnimTimelineItem:
             self,
             trigger_time: float = None,
             commands: list[str] = []):
+        """
+        Parameters
+        ----------
+        trigger_time : float
+            The time in seconds when this timeline item will trigger.
+        commands : list[str]
+            A list of commands which will be run at this point in the timeline.
+            Note that this only works for behavior pack animations.
+        """
+        
         self.trigger_time: float = trigger_time
         """The time in seconds when this timeline item will trigger."""
         self.commands: list[str] = commands
@@ -265,7 +275,20 @@ class Animation:
             identifier: str,
             looping: bool = False,
             length: float = None,
-            timeline_items: list = None):
+            timeline_items: list[AnimTimelineItem] = None):
+        """
+        Parameters
+        ----------
+        identifier : str
+            The unique ID for this animation.
+        looping : bool
+            Whether this animation should loop when it finishes.
+        length : float
+            Duration of this animation in seconds.
+        timeline_items : list[AnimTimelineItem]
+            All of the timeline items, or keyframes, in this animation.
+        """
+
         self.identifier: str = identifier
         """The unique ID for this animation."""
         self.looping: bool = looping
@@ -335,6 +358,13 @@ class AnimationFile:
     animations: list[Animation]
     """
     def __init__(self, animations: list[Animation] = []):
+        """
+        Parameters
+        ----------
+        animations : list[Animation] 
+            The list of animations contained in this file.
+        """
+
         self.format_version: str = "1.8.0"
         """The format version for Bedrock to use when reading this file."""
         self.animations: list[Animation] = animations
@@ -397,9 +427,34 @@ class AncoState:
             transitions: list[list[str]]=None,
             animations: list[str]=None,
             transition_time: float=None):
+        """
+        Parameters
+        ----------
+        identifier : str
+            ID of the anco state, must be unique within the anco.
+        entry_commands : list[str]
+            A list of commands to execute when the state is entered.\n
+            Each command must include a forward slash / prefix.
+        exit_commands : list[str]
+            A list of commands to execute when the state is exited.\n
+            Each command must include a forward slash / prefix.
+        transitions : list[list[str]]
+            A list of two-element lists, where subelement 1 is the state to
+            transition to, and subelement 2 is the condition.\n
+            Example: [
+                ['init', 'query.all_animations_finished'],
+                ['dead', 'query.health <= 0']
+            ]
+        animations: list[str]
+            A list of animations to play while in this state.
+        transition_time : float
+            Time in seconds during which animations from this state will blend
+            with animations in the next state.
+        """
+
         self.identifier = identifier
         """ID of the anco state, must be unique within the anco."""
-        self._transitions = []
+        self._transitions: list[list[str]] = []
         """
         A list of two-element lists, where subelement 1 is the state to
         transition to, and subelement 2 is the condition.
@@ -574,18 +629,13 @@ class AncoState:
 
 class EventRandomizer:
     """
-    Class which stores data and generates a JSON dict for an
-    event randomization option
+    Class which represents an event randomization option.
     """
     def __init__(self,
                  weight: int = 1,
                  add_groups: list = None,
                  remove_groups: list = None,
                  set_properties: dict = None):
-        """
-        Each key of set_properties is an entity property ID, and each 
-        value is what that property will be set to.
-        """
         self._weight = weight
         """The weight of this randomizer option against others in the event"""
         self._add_groups = add_groups

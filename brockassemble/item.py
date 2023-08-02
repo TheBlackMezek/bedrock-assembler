@@ -28,6 +28,25 @@ class Item:
             texture_name: str = None,
             id: str = None,
             category: str = 'Items'):
+        """
+        Parameters
+        ----------
+        namespace : str
+            The namespace for this item type, which will be prefixed to
+            the item ID. This should probably be the same as all other
+            namespaces in your addon.
+        name : str
+            The display name for this item type.
+            If the id parameter is not used in, name will be used to
+            generate an identifier.
+        texture_name : str
+            The file name of the inventory icon this item will use.
+        id : str
+            The ID for this item type, minus its namespace.
+        category : str
+            The category of this item type.
+        """
+        
         self.namespace = namespace
         """
         The namespace for this item type, which will be prefixed to
@@ -37,8 +56,6 @@ class Item:
         self._name = name
         """
         The display name for this item type.
-        If the id parameter is not used in __init__, name will be used to
-        generate an identifier.
         """
         self.category = category
         """The category of this item type."""

@@ -2,7 +2,6 @@
 Module containing the Component class and functions for generating various
 entity components.
 """
-from typing import Union
 
 
 class Component:
@@ -17,6 +16,18 @@ class Component:
     """
 
     def __init__(self, type: str, priority: int = None):
+        """
+        Parameters
+        ----------
+        type : str
+            The component type ID. Must be a valid type for the component
+            system you're using.
+        priority : int
+            The priority of following this component compared to all others
+            currently active. Lower numbers are higher priority, with 0 being
+            highest priority.
+        """
+
         self.json_obj: dict = {}
         """The JSON-writable body of the component."""
 
