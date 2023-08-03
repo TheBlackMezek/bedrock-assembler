@@ -1717,7 +1717,8 @@ class AnimationController:
         Returns
         -------
         AncoState | None
-            An AncoState if one with the ID state_name is found, otherwise None.
+            An AncoState if one with the ID state_name is found,
+            otherwise None.
         """
         for i in self._states:
             if i.identifier == state_name:
@@ -1726,52 +1727,176 @@ class AnimationController:
 
 
 class EntityGraphics:
+    """
+    Class which represents an entity's resource file.
+
+    Attributes
+    ----------
+    identifier : str
+    material : str
+    render_controller : str
+    egg_color_1 : str
+    egg_color_2 : str
+    invisible : bool
+    scale : float
+    """
     def __init__(
             self,
-            identifier,
-            string_variables=None,
-            material='basic',
-            render_controller='controller.render.default_controller',
-            egg_color_1='#550077',
-            egg_color_2='#88cc88',
-            texture_path=None,
-            invisible=False,
-            geo=None,
-            animations=None,
-            animate_list=None,
-            particle_dict=None):
+            identifier: str,
+            string_variables: dict = None,
+            material: str = 'basic',
+            render_controller: str = 'controller.render.default_controller',
+            egg_color_1: str = '#550077',
+            egg_color_2: str = '#88cc88',
+            texture_path: str | dict = None,
+            invisible: bool = False,
+            geo: str | dict = None,
+            animations: dict = None,
+            animate_list: list[str] = None,
+            particles: dict = None):
         """
-        texture_path automatically adds 'textures/entity/' to the start\n
-        geo automatically adds 'geometry.' to the start\n
-        If texture_path or geo are not provided, identifier will be used as:\n
-        textures/entity/identifier\n
-        geometry.identifier\n
-        texture_path and geo can also be dicts, and prefixes will be applied to each element
+        Parameters
+        ----------
+        identifier : str
+            The unique ID of this entity, including namespace. This must match
+            the ID of a Behaviors object, representing an entity's
+            behavior file.
+        string_variables : dict
+            A set of string values to match and replace in this behavior JSON
+            file when it is written. Likely to be removed in future versions.
+        material : str
+            The ID of the material this entity will use for rendering.
+        render_controller : str
+            The ID of the render controller this entity will use for rendering.
+        egg_color_1 : str
+            The primary color of this entity's spawn egg. It makes up the bulk
+            of the texture.
+        egg_color_2 : str
+            The secondary color of this entity's spawn egg. It determines the
+            color of the spawn egg's spots.
+        texture_path : str | dict
+            The file path of the texture this entity will use. Can be given a
+            dict of possible textures, allowing for runtime texture switching.
+            If None, one will be created from the identifier, in the format of
+            'textures/entity/identifier'.
+            If a string, 'texture/entity/' will be prepended automatically for
+            convenience.
+            If a dict, each value will be set to its key prepended with
+            'texture/entity/'.
+        invisible : bool
+            If true, the entity will not be rendered.
+        geo : str | dict
+            The ID of the geometry this entity will use. Can be given a
+            dict of possible geometries, allowing for runtime geo switching.
+            If None, one will be created from the identifier, in the format of
+            'geometry.identifier'.
+            If a string, 'geometry.' will be prepended automatically for
+            convenience.
+            If a dict, each value will be set to its key prepended with
+            'geometry.'.
+        animations : dict
+            The animations and animation controllers available for this entity
+            to use. Each key is an arbitrary name unique within this entity
+            which can be used by the animate list and animation controllers.
+            Each value is the ID of an animation or animation controller.
+        animate_list : list[str]
+            The animations and animation controllers for this entity to run
+            constantly. These must correspond to the arbitrary keys in the
+            animation dict, not to actual animation or anco IDs.
+        particles : dict
+            The particles available for this entity to use. Each key is an
+            arbitrary name unique within this entity which can be used by the
+            animations. Each value is the ID of a particle.
         """
-        self.identifier = identifier
-        self.material = material
-        self.render_controller = render_controller
-        self.egg_color_1 = egg_color_1
-        self.egg_color_2 = egg_color_2
-        self.anim_obj = animations
-        self.animate_list = animate_list
-        self.particle_obj = None
-        self.init_list = None
-        self.pre_anim = None
-        self.invisible = invisible
-        self.string_variables = string_variables
-        self.scale = 1.0
-        self.particle_obj = particle_dict
 
+        self.identifier: str = identifier
+        """
+        The unique ID of this entity, including namespace. This must match
+        the ID of a Behaviors object, representing an entity's
+        behavior file.
+        """
+        self.material: str = material
+        """The ID of the material this entity will use for rendering."""
+        self.render_controller: str = render_controller
+        """
+        The ID of the render controller this entity will use for rendering.
+        """
+        self.egg_color_1: str = egg_color_1
+        """
+        The primary color of this entity's spawn egg. It makes up the bulk
+        of the texture.
+        """
+        self.egg_color_2: str = egg_color_2
+        """
+        The secondary color of this entity's spawn egg. It determines the
+        color of the spawn egg's spots.
+        """
+        self.invisible: bool = invisible
+        """If true, the entity will not be rendered."""
+        self.scale: float = 1.0
+        """
+        The scale to render this entity at. Its visual size will be multiplied
+        by this value.
+        """
+        self.init_list: list[str] = None
+        """
+        A list of Molang expressions to initialize variables in this entity.
+        """
+        self.pre_anim: list[str] = None
+        """
+        A list of Molang expressions to set variables before processing
+        animations each tick.
+        """
+
+        self._anim_obj: dict = animations
+        """
+        The animations and animation controllers available for this entity
+        to use. Each key is an arbitrary name unique within this entity
+        which can be used by _animate_list and animation controllers.
+        Each value is the ID of an animation or animation controller.
+        """
+        self._animate_list: list[str] = animate_list
+        """
+        The animations and animation controllers for this entity to run
+        constantly. These must correspond to the arbitrary keys in the
+        _anim_obj, not to actual animation or anco IDs.
+        """
+        self._string_variables: dict = string_variables
+        """
+        A dict of key-value string pairs. These are searched for and replaced
+        in the entity JSON file when it's generated. Likely to be removed in a
+        future version.
+        """
+        self._particle_obj: dict = particles
+        """
+        The particles available for this entity to use. Each key is an
+        arbitrary name unique within this entity which can be used by the
+        animations. Each value is the ID of a particle.
+        """
+
+        self.texture_path : str | dict
+        """
+        The file path of the texture this entity will use. Can also be a
+        dict of possible textures, allowing for runtime texture switching.
+        If a dict, the keys are arbitrary names usable by render controllers,
+        and the values are the texture paths.
+        """
         if texture_path is None:
             self.texture_path = 'textures/entity/' + self.identifier
         elif type(texture_path) is str:
             self.texture_path = 'textures/entity/' + texture_path
         elif type(texture_path) is dict:
             self.texture_path = texture_path
-            for key in self.geo.keys():
+            for key in self.texture_path.keys():
                 self.texture_path[key] = 'textures/entity/' + self.texture_path[key]
 
+        self.geo : str | dict
+        """
+        The ID of the geometry this entity will use. Can be a
+        dict of possible geometries, allowing for runtime geo switching.
+        If a dict, the keys are arbitrary names usable by render controllers,
+        and the values are the geometry IDs.
+        """
         if geo is None:
             self.geo = 'geometry.' + self.identifier
         elif type(geo) is str:
@@ -1781,41 +1906,101 @@ class EntityGraphics:
             for key in self.geo.keys():
                 self.geo[key] = 'geometry.' + self.geo[key]
 
-    def add_animations(self, anim_obj: dict):
+    def add_animations(self, anim_obj: dict) -> None:
+        """
+        Add animations to be usable by this entity.
+
+        Parameters
+        ----------
+        anim_obj : dict
+            The animation to add. Each key is an arbitrary name used by
+            the the animate list and animation controllers, and each value is
+            the ID of an animation.
+        """
         if self.anim_obj is None:
             self.anim_obj = anim_obj
         else:
             self.anim_obj.update(anim_obj)
     
-    def add_particles(self, obj: dict):
+    def add_particles(self, obj: dict) -> None:
+        """
+        Add particles to be usable by this entity.
+
+        Parameters
+        ----------
+        anim_obj : dict
+            The animation to add. Each key is an arbitrary name used by
+            animations, and each value is the ID of a particle.
+        """
         if self.particle_obj is None:
             self.particle_obj = obj
         else:
             self.particle_obj.update(obj)
 
-    def add_animate_list(self, animate_list: list):
+    def add_animate_list(self, animate_list: list[str]) -> None:
+        """
+        Set additional animations and/or animation controllers for this entity
+        to run by default.
+
+        Parameters
+        ----------
+        animate_list : list[str]
+            The animations and/or animation controllers to run. These must be
+            the arbitrary names set in the entity resource file, not the actual
+            IDs of the anims and ancos.
+        """
         if self.animate_list is None:
             self.animate_list = animate_list
         else:
             self.animate_list.extend(animate_list)
 
-    def add_script_initialize(self, init_list: list):
+    def add_script_initialize(self, init_list: list[str]) -> None:
+        """
+        Add Molang initialization expressions.
+
+        Parameters
+        ----------
+        init_list : list[str]
+            The Molang expressions to be run when the entity initializes.
+        """
         if self.init_list is None:
             self.init_list = init_list
         else:
             self.init_list.extend(init_list)
 
-    def add_script_pre_anim(self, pre_anim: list):
+    def add_script_pre_anim(self, pre_anim: list[list]) -> None:
+        """
+        Add Molang expressions to run before processing animations each tick.
+
+        Parameters
+        ----------
+        pre_anim : list[str]
+            The Molang expressions to be run.
+        """
         if self.pre_anim is None:
             self.pre_anim = pre_anim
         else:
             self.pre_anim.extend(pre_anim)
 
-    def add_ranco(self, ranco: AnimationController):
+    def add_ranco(self, ranco: AnimationController) -> None:
+        """
+        Register an animation controller to run by default in this entity. It
+        will be added to the animation dict as well as the animate list.
+
+        Parameters
+        ----------
+        ranco : AnimationController
+            The animation controller to be run.
+        """
         self.add_animations({ranco.identifier: ranco.identifier})
         self.add_animate_list([ranco.identifier])
 
-    def add_humanoid_animations(self):
+    def add_humanoid_animations(self) -> None:
+        """
+        Adds a large set of animations, animation controllers, and
+        variable-setting Molang expressions, which set the entity up to use
+        vanilla humanoid animations.
+        """
         self.add_animations({
             "root": "controller.animation.humanoid.root",
             "base_controller": "controller.animation.player.base",
@@ -1888,7 +2073,16 @@ class EntityGraphics:
             "variable.tcos0 = (math.cos(query.modified_distance_moved * 38.17) * query.modified_move_speed / variable.gliding_speed_value) * 57.3;"
         ])
 
-    def get_json(self):
+    def get_json(self) -> dict:
+        """
+        Builds a JSON-ready dict of this entity resource definition.
+
+        Returns
+        -------
+        dict
+            A JSON-ready object which can be written as
+            an entity resource file.
+        """
         obj = {}
         obj['format_version'] = ENTITY_GRAPHICS_FORMAT_VERSION
 
@@ -1916,8 +2110,8 @@ class EntityGraphics:
         if self.anim_obj is not None:
             desc['animations'] = self.anim_obj
         
-        if self.particle_obj is not None:
-            desc['particle_effects'] = self.particle_obj
+        if self._particle_obj is not None:
+            desc['particle_effects'] = self._particle_obj
 
         script_obj = {'scale':str(self.scale)}
         if self.animate_list is not None:
@@ -1930,8 +2124,8 @@ class EntityGraphics:
 
         obj['minecraft:client_entity'] = {'description':desc}
 
-        if self.string_variables is not None:
-            replace_obj_string_variables(obj, self.string_variables)
+        if self._string_variables is not None:
+            replace_obj_string_variables(obj, self._string_variables)
 
         return obj
 
