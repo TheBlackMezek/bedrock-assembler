@@ -588,7 +588,7 @@ class AncoState:
 
     def add_animation(self, anim: str) -> None:
         """
-        Adds an animation to play while in this state
+        Adds an animation to play while in this state.
 
         Parameters
         ----------
@@ -2131,65 +2131,179 @@ class EntityGraphics:
 
 
 class Entity:
+    """
+    Class representing an entire Bedrock entity. It contains both an entity's
+    Behaviors and EntityGraphics, and tracks data common between them.
+
+    Attributes
+    ----------
+    namespace : str
+    """
     def __init__(
             self,
-            namespace,
-            name,
-            string_variables=None,
-            id=None,
-            egg_name=None,
-            collision_x=0,
-            collision_y=0,
-            hp=None,
-            attack=None,
-            move_speed=None,
-            has_physics=True,
-            no_damage=False,
-            spawn_groups=None,
-            has_graphics=False,
-            entity_graphics=None,
-            invisible=False,
-            runtime_identifier=None,
-            despawnable=False,
-            ambient_sound=None,
-            hurt_sound=None,
-            death_sound=None,
-            step_sound=None,
-            sounds_pitch_range=[0.8, 1.2],
-            sounds_volume=1.0):
-        self.namespace = namespace
-        self.name = name
-        self.bancos = []
-        self.current_state=0
-        self.rancos = []
+            namespace: str,
+            name: str,
+            string_variables: dict = None,
+            id: str = None,
+            egg_name: str = None,
+            collision_x: float = 0,
+            collision_y: float = 0,
+            hp: int = None,
+            attack: int = None,
+            move_speed: float = None,
+            has_physics: bool = True,
+            no_damage: bool = False,
+            spawn_groups: list[str] = None,
+            has_graphics: bool = False,
+            entity_graphics: EntityGraphics = None,
+            invisible: bool = False,
+            runtime_identifier: str = None,
+            despawnable: bool = False,
+            ambient_sound: str = None,
+            hurt_sound: str = None,
+            death_sound: str = None,
+            step_sound: str = None,
+            sounds_pitch_range: list[float] = [0.8, 1.2],
+            sounds_volume: float = 1.0):
+        """
+        Parameters
+        ----------
+        namespace : str
+            The namespace of this entity.
+        name : str
+            The display name of this entity. Used to generate an identifier if
+            a separate ID is not given.
+        string_variables : dict
+            A set of string values to match and replace in this behavior JSON
+            file when it is written. Likely to be removed in future versions.
+        id : str
+            The unique ID of this entity.
+        egg_name : str
+            The display name of this entity's spawn egg.
+        collision_x : float
+            The horizontal size of this entity's hitbox,
+            on both the X and Z axes.
+        collision_y : float
+            The vertical size of this entity's hitbox.
+        hp : int
+            The maximum health of this entity. One point is 1/2 heart.
+        attack : int
+            The melee damage of this entity.
+        move_speed : float
+            How fast this entity walks.
+        has_physics : bool
+            Whether this entity should collide with things
+            and be affected by gravity.
+        no_damage : bool
+            If true, this entity will not receive damage from any source,
+            though it can still be killed with /kill.
+        spawn_groups : list[str]
+            The component groups this entity should spawn with enabled.
+        has_graphics : bool
+            If has_graphics is True and entity_graphics is not provided, an
+            EntitGraphics object will be generated for this entity in
+            __init__().
+        entity_graphics : EntityGraphics
+            The EntityGraphics object for this Entity to use.
+        invisible : bool
+            If true, this entity will not render.
+        runtime_identifier : str
+            The ID of a vanilla Bedrock entity to inherit from. The effects of
+            this vary widely depending on the parent entity.
+        ambient_sound : str
+            The ID of a sound this entity will play on occasion at random.
+        hurt_sound : str
+            The ID of a sound this entity will play when it takes damage.
+        death_sound : str
+            The ID of the sound this entity will play when it dies.
+        step_sound : str
+            The ID of a sound this entity will play as it walks.
+        sounds_pitch_range : list[float]
+            The pitch range for all of this entity's sounds. Must be a list of
+            two floats, a minimum and maximum value. For example:
+                [0.8, 1.2]
+            When a sound is played, it will be at a random pitch between these
+            values.
+        sounds_volume : float
+            The volume to play all this entity's sounds at. How exactly this
+            works is strange, so you may need to fiddle with it to get the
+            results you need.
+        """
 
-        self.ambient_sound=ambient_sound
-        self.hurt_sound=hurt_sound
-        self.death_sound=death_sound
-        self.step_sound=step_sound
-        self.sounds_pitch_range=sounds_pitch_range
-        self.sounds_volume=sounds_volume
+        self.namespace: str = namespace
+        """The namespace of this entity."""
+        self.name: str = name
+        """The display name of this entity."""
+        self._bancos: list[AnimationController] = []
+        """All behavior pack animation controllers this entity uses."""
+        self._current_state=0
+        """The number of the currently active loop state."""
+        self.rancos: list[AnimationController] = []
+        """All resource pack animation controllers this entity uses."""
 
+        self.ambient_sound = ambient_sound
+        """The ID of a sound this entity will play on occasion at random."""
+        self.hurt_sound = hurt_sound
+        """The ID of a sound this entity will play when it takes damage."""
+        self.death_sound = death_sound
+        """The ID of the sound this entity will play when it dies."""
+        self.step_sound = step_sound
+        """The ID of a sound this entity will play as it walks."""
+        self.sounds_pitch_range = sounds_pitch_range
+        """
+        The pitch range for all of this entity's sounds. Must be a list of
+        two floats, a minimum and maximum value. For example:
+            [0.8, 1.2]
+        When a sound is played, it will be at a random pitch between these
+        values.
+        """
+        self.sounds_volume = sounds_volume
+        """
+        The volume to play all this entity's sounds at. How exactly this
+        works is strange, so you may need to fiddle with it to get the
+        results you need.
+        """
+
+        self.identifier: str
+        """The unique ID of this entity."""
         if id is not None:
             self.identifier = id
         else:
             self.identifier = name.lower().replace(' ', '_')
-        
+
+        self.egg_name: str
+        """The display name of this entity's spawn egg."""
         if egg_name is not None:
             self.egg_name = egg_name
         else:
             self.egg_name = 'Spawn ' + name
 
         self.string_variables = string_variables
+        """
+        A set of string values to match and replace in this behavior JSON
+        file when it is written. Likely to be removed in future versions.
+        """
 
+        self.graphics: EntityGraphics
+        """This entity's resource pack definition."""
         if entity_graphics is not None:
             self.graphics = entity_graphics
         elif has_graphics:
-            self.graphics = EntityGraphics(self.get_id(), string_variables=self.string_variables, invisible=invisible)
+            self.graphics = EntityGraphics(
+                self.get_id(),
+                string_variables=self.string_variables,
+                invisible=invisible
+            )
         else:
             self.graphics = None
 
-        self.behaviors = Behaviors(self.get_id(), self.string_variables, runtime_identifier)
+        self.behaviors = Behaviors(
+            self.get_id(),
+            self.string_variables,
+            runtime_identifier
+        )
+        """This entity's behavior pack definition."""
+
         self.add_component(component_collision_box(collision_x, collision_y))
         if hp is not None:
             self.add_component(component_health(hp))
@@ -2209,47 +2323,142 @@ class Entity:
             self.add_component_group(despawn_group)
             self.add_event(Event('despawn', add_groups=['despawn']))
 
-    def get_id(self):
+    def get_id(self) -> str:
+        """
+        Returns the complete entity identifier, including namespace.
+
+        Returns
+        -------
+        str
+            The full ID of this event.
+        """
         return self.namespace + ':' + self.identifier
 
-    def add_component(self, component):
+    def add_component(self, component: Component) -> None:
+        """
+        Add a component to this Entity's behaviors.
+
+        Parameters
+        ----------
+        component : Component
+            The Component to add.
+        """
         self.behaviors._components.append(component)
 
-    def add_component_list(self, comp_list):
+    def add_component_list(self, comp_list: list[Component]) -> None:
+        """
+        Add a set of components to this Entity's behaviors.
+
+        Parameters
+        ----------
+        comp_list : list[Component]
+            The Components to add.
+        """
         for c in comp_list:
             self.add_component(c)
 
-    def add_component_group(self, group):
+    def add_component_group(self, group: ComponentGroup) -> None:
+        """
+        Add a component group to this Entity's behaviors.
+
+        Parameters
+        ----------
+        group : ComponentGroup
+            The ComponentGroup to add.
+        """
         self.behaviors._component_groups.append(group)
 
-    def add_event(self, event):
+    def add_event(self, event: Event) -> None:
+        """
+        Add an event to this Entity's behaviors.
+
+        Parameters
+        ----------
+        event : Event
+            The Event to add.
+        """
         self.behaviors._events.append(event)
 
-    def create_banco(self, banco_name, initial_state=None):
-        banco = AnimationController('controller.animation.' + self.identifier + '_' + banco_name,
-                                    initial_state=initial_state,
-                                    string_variables=self.string_variables)
-        self.bancos.append(banco)
+    def create_banco(self, banco_name: str, initial_state: str = None) -> int:
+        """
+        Create and add a new behavior pack animation controller in this entity.
+
+        Parameters
+        ----------
+        banco_name : str
+            The name of the new banco. It does not require any naming
+            boilerplate, and will be automatically prepended with
+            'controller.animation.' and the entity's name, to ensure it's
+            a valid name and unique between entities.
+        initial_state : str
+            If provided, the banco will initialize into a state with this
+            name instead of the default one.
+
+        Returns
+        -------
+        int
+            The index of this banco within the Entity's banco list.
+        """
+        banco = AnimationController(
+            'controller.animation.' + self.identifier + '_' + banco_name,
+            initial_state=initial_state,
+            string_variables=self.string_variables
+        )
+        self._bancos.append(banco)
 
         if self.behaviors is not None:
             self.behaviors.add_banco(banco.identifier)
         else:
-            print('WARNING: banco added to entity without behaviors')
+            print('WARNING: banco added to an entity which has no Behaviors.')
 
-        return len(self.bancos)-1
+        return len(self._bancos)-1
 
-    def add_banco(self, banco):
-        self.bancos.append(banco)
+    def add_banco(self, banco: AnimationController) -> int:
+        """
+        Add a new behavior pack animation controller in this entity.
+
+        Parameters
+        ----------
+        banco : AnimationController
+            The animation controller to add.
+
+        Returns
+        -------
+        int
+            The index of this banco within the Entity's banco list.
+        """
+        self._bancos.append(banco)
         if self.behaviors is not None:
             self.behaviors.add_banco(banco.identifier)
         else:
-            print('WARNING: banco added to entity without behaviors')
-        return len(self.bancos)-1
+            print('WARNING: banco added to an entity which has no Behaviors.')
+        return len(self._bancos)-1
 
-    def create_ranco(self, ranco_name, initial_state=None):
-        ranco = AnimationController('controller.animation.' + self.identifier + '_' + ranco_name,
-                                    initial_state=initial_state,
-                                    string_variables=self.string_variables)
+    def create_ranco(self, ranco_name: str, initial_state: str = None) -> int:
+        """
+        Create and add a new resource pack animation controller in this entity.
+
+        Parameters
+        ----------
+        ranco_name : str
+            The name of the new ranco. It does not require any naming
+            boilerplate, and will be automatically prepended with
+            'controller.animation.' and the entity's name, to ensure it's
+            a valid name and unique between entities.
+        initial_state : str
+            If provided, the ranco will initialize into a state with this
+            name instead of the default one.
+
+        Returns
+        -------
+        int
+            The index of this ranco within the Entity's ranco list.
+        """
+        ranco = AnimationController(
+            'controller.animation.' + self.identifier + '_' + ranco_name,
+            initial_state=initial_state,
+            string_variables=self.string_variables
+        )
         self.rancos.append(ranco)
 
         if self.graphics is not None:
@@ -2259,7 +2468,20 @@ class Entity:
 
         return len(self.rancos)-1
 
-    def add_ranco(self, ranco):
+    def add_ranco(self, ranco: AnimationController) -> int:
+        """
+        Add a new resource pack animation controller in this entity.
+
+        Parameters
+        ----------
+        ranco : AnimationController
+            The animation controller to add.
+
+        Returns
+        -------
+        int
+            The index of this ranco within the Entity's ranco list.
+        """
         self.rancos.append(ranco)
         if self.graphics is not None:
             self.graphics.add_ranco(ranco)
@@ -2267,53 +2489,187 @@ class Entity:
             print('WARNING: ranco added to entity without graphics')
         return len(self.rancos)-1
 
-    def add_banco_state(self, banco_idx, state):
-        self.bancos[banco_idx].add_state(state)
+    def add_banco_state(self, banco_idx: int, state: AncoState) -> None:
+        """
+        Add an AncoState to a banco in this Entity's banco list.
 
-    def add_ranco_state(self, ranco_idx, state):
+        Parameters
+        ----------
+        banco_idx : int
+            The index of the banco within the Entity's banco list.
+        state : AncoState
+            The animation controller state to add.
+        """
+        self._bancos[banco_idx].add_state(state)
+
+    def add_ranco_state(self, ranco_idx: int, state: AncoState) -> None:
+        """
+        Add an AncoState to a ranco in this Entity's ranco list.
+
+        Parameters
+        ----------
+        ranco_idx : int
+            The index of the ranco within the Entity's ranco list.
+        state : AncoState
+            The animation controller state to add.
+        """
         self.rancos[ranco_idx].add_state(state)
 
-    def add_spawn_group(self, group):
+    def add_spawn_group(self, group: str) -> None:
+        """
+        Set an additional component group to be enabled in the Entity's
+        behaviors on spawn.
+
+        Parameters
+        ----------
+        group : str
+            The ID of the component group to enable.
+        """
         self.behaviors._spawn_groups.append(group)
 
-    def add_spawn_groups(self, groups):
+    def add_spawn_groups(self, groups: list[str]) -> None:
+        """
+        Set an additional list of component group to be enabled in the Entity's
+        behaviors on spawn.
+
+        Parameters
+        ----------
+        groups : list[str]
+            The IDs of the component groups to enable.
+        """
         for i in groups:
             self.behaviors._spawn_groups.append(i)
 
-    def set_identifier(self, id):
+    def set_identifier(self, id: str) -> None:
+        """
+        Set the ID of this Entity, and copy it into this Entity's Behaviors
+        and EntityGraphics.
+
+        Parameters
+        ----------
+        id : str
+            This entity's new ID.
+        """
         self.identifier = id
         self.behaviors.identifier = self.get_id()
+        if self.graphics is not None:
+            self.graphics.identifier = self.get_id()
 
-    def current_lstate(self):
-        return 'state_' + str(self.current_state)
+    def current_lstate(self) -> str:
+        """
+        Get the ID of the currently active loop state.
 
-    def next_lstate(self):
-        return 'state_' + str(self.current_state+1)
+        Returns
+        -------
+        str
+            The ID of the currently active loop state.
+        """
+        return 'state_' + str(self._current_state)
 
-    def prev_lstate(self):
-        return 'state_' + str(self.current_state-1)
+    def next_lstate(self) -> str:
+        """
+        Get the ID of the next loop state.
+
+        Returns
+        -------
+        str
+            The ID of the next loop state.
+        """
+        return 'state_' + str(self._current_state+1)
+
+    def prev_lstate(self) -> str:
+        """
+        Get the ID of the previous loop state.
+
+        Returns
+        -------
+        str
+            The ID of the previous loop state.
+        """
+        return 'state_' + str(self._current_state-1)
 
     def add_loop_state(
             self,
-            banco_id=0,
-            ranco_id=0,
-            components=None,
-            entry_commands=None,
-            exit_commands=None,
-            timer_len=None,
-            last_state=False,
-            name=None,
-            connection_list=None,
-            timer_state=None,
-            hp=None,
-            attack=None,
-            move_speed=None,
-            no_damage=False,
-            animation=None,
-            end_anim_with_state=True,
-            anim_blend_time=0.2,
-            set_properties: dict=None):
-        group = ComponentGroup(self.current_lstate(), skin_id=self.current_state)
+            banco_id: int = 0,
+            ranco_id: int = 0,
+            components: list[Component] = None,
+            entry_commands: list[str] = None,
+            exit_commands: list[str] = None,
+            timer_len: float = None,
+            last_state: bool = False,
+            name: str = None,
+            connection_list: list[str] = None,
+            timer_state: str = None,
+            hp: int = None,
+            attack: int = None,
+            move_speed: float = None,
+            no_damage: bool = False,
+            animation: str = None,
+            end_anim_with_state: bool = True,
+            anim_blend_time: float = 0.2,
+            set_properties: dict = None
+        ) -> None:
+        """
+        Parameters
+        ----------
+        banco_id : int
+            The index of the banco in this Entity's banco list which this loop
+            state will use.
+        ranco_id : int
+            The index of the ranco in this Entity's ranco list which this loop
+            state will use.
+        components : list[Component]
+            The Components which will be in this loop state's component group.
+            Avoid adding redundant Components which are already added by using
+            other parameters in this method.
+        entry_commands : list[str]
+            The commands which will be executed when this loop state is entered.
+        exit_commands : list[str]
+            The commands which will be executed when this loop state is exited.
+        time_len : float
+            If used, this loop state will end after time_len seconds.
+        last_state : bool
+            Must be set to True if this is the last state in the sequence, or
+            it will not loop back to the start.
+        name : str
+            The ID of this loop state, for use in creating non-linear
+            connections.
+        connection_list : list[str]
+            A list of the names of all other loop states which connect to this
+            one in a non-linear way.
+        timer_state : str
+            The name of the loop state to transition into when time_len reaches
+            0, if a branching connection is desired.
+        hp : int
+            The entity's max health while it's in this loop state. 1 point is
+            1/2 heart.
+        attack : int
+            The entity's melee damage while it's in this loop state.
+        move_speed : float
+            The entity's walk speed while it's in this loop state.
+        no_damge : bool
+            If true, the entity will be unable to take damage while in this
+            loop state. It can still be killed with /kill.
+        animation : str
+            The name of an animation or ranco to play while in this loop state.
+            Note that this is one of the arbitrary name set in the resource
+            file, not an actual ID.
+        end_anim_with_state : bool
+            If true, forces the animation to end when the loop state does. If
+            false, the animation will end when the animation itself finishes.
+        anim_blend_time : float
+            The time in seconds to blend between this loop state's animation
+            and the animation it transitions into.
+        set_properties : dict
+            The entity properties to set when this loop state is entered. Each
+            key is the ID of an entity property, and each value is what to set
+            it to.
+        """
+
+        group = ComponentGroup(
+            self.current_lstate(),
+            skin_id = self._current_state
+        )
         if timer_len is not None:
             if timer_state is not None:
                 group.add_component(component_timer(timer_len, timer_state))
@@ -2339,7 +2695,7 @@ class Entity:
 
         if entry_commands is not None or exit_commands is not None:
             banco_state = AncoState(self.current_lstate())
-            banco_state.add_transition('init', 'query.skin_id!='+str(self.current_state))
+            banco_state.add_transition('init', 'query.skin_id!='+str(self._current_state))
             if entry_commands is not None:
                 for i in entry_commands:
                     banco_state.add_entry_command(i)
@@ -2348,15 +2704,15 @@ class Entity:
                     banco_state.add_exit_command(i)
             self.add_banco_state(banco_id, banco_state)
 
-            self.bancos[banco_id].initial_state = 'init'
-            if not self.bancos[banco_id].has_state('init'):
+            self._bancos[banco_id].initial_state = 'init'
+            if not self._bancos[banco_id].has_state('init'):
                 self.add_banco_state(banco_id, AncoState('init'))
-            self.bancos[banco_id].get_state('init').add_transition(self.current_lstate(), 'query.skin_id=='+str(self.current_state))
+            self._bancos[banco_id].get_state('init').add_transition(self.current_lstate(), 'query.skin_id=='+str(self._current_state))
 
         if animation is not None:
             ranco_state = AncoState(self.current_lstate())
             if end_anim_with_state:
-                ranco_state.add_transition('init', 'query.skin_id!='+str(self.current_state))
+                ranco_state.add_transition('init', 'query.skin_id!='+str(self._current_state))
             else:
                 ranco_state.add_transition('init', 'query.all_animations_finished')
             ranco_state.add_animation(animation)
@@ -2366,9 +2722,9 @@ class Entity:
             self.rancos[ranco_id].initial_state = 'init'
             if not self.rancos[ranco_id].has_state('init'):
                 self.add_ranco_state(ranco_id, AncoState('init'))
-            self.rancos[ranco_id].get_state('init').add_transition(self.current_lstate(), 'query.skin_id=='+str(self.current_state))
+            self.rancos[ranco_id].get_state('init').add_transition(self.current_lstate(), 'query.skin_id=='+str(self._current_state))
 
-        if self.current_state == 0 and set_properties is not None:
+        if self._current_state == 0 and set_properties is not None:
             self.behaviors._spawn_properties.update(set_properties)
 
         event = Event(
@@ -2396,9 +2752,17 @@ class Entity:
                     self.behaviors._lstate_names[i] = [None]
                 self.behaviors._lstate_names[i].append(self.current_lstate())
 
-        self.current_state += 1
+        self._current_state += 1
 
-    def get_sounds_obj(self):
+    def get_sounds_obj(self) -> dict:
+        """
+        Compile a JSON-ready dict of this entity's basic sounds.
+
+        Returns
+        -------
+        dict
+            A JSON-ready dict ready to write into a sound definition file.
+        """
         obj = {}
 
         events = {}
