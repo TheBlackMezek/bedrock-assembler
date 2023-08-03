@@ -914,7 +914,14 @@ class Event:
         self._set_properties['property:'+prop_id] = value
 
     def get_id(self) -> str:
-        """Returns the event identifier, with a namespace if it has one."""
+        """
+        Returns the event identifier, with a namespace if it has one.
+        
+        Returns
+        -------
+        str
+            The full ID of this event.
+        """
         if self.namespace is not None:
             return self.namespace + ':' + self.identifier
         else:
@@ -922,7 +929,7 @@ class Event:
 
     def get_json(self) -> dict:
         """
-        Builds a JSON-ready dict of this event option which can be used in
+        Builds a JSON-ready dict of this event which can be used in
         a behavior file.
 
         Returns
@@ -986,27 +993,72 @@ class Event:
 
 class ComponentGroup:
     """
-    Class which stores data and generates a JSON dict for a component group
+    Class which represents a component group.
+
+    Attributes
+    ----------
+    identifier : str
     """
     def __init__(
             self,
             identifier: str,
-            namespace: str=None,
-            skin_id: int=None,
-            timer_len: float=None,
-            timer_event: str=None,
-            hp: int=None,
-            attack: int=None,
-            move_speed: float=None,
-            has_physics: bool=False,
-            no_damage: bool=False,
-            scale: float=None):
-        self.identifier = identifier
-        """Name of the component group"""
-        self._namespace = namespace
-        """Namespace of the component group"""
-        self._components = []
-        """List of Component objects which comprise this component group"""
+            namespace: str = None,
+            skin_id: int = None,
+            timer_len: float = None,
+            timer_event: str = None,
+            hp: int = None,
+            attack: int = None,
+            move_speed: float = None,
+            has_physics: bool = False,
+            no_damage: bool = False,
+            scale: float = None):
+        """
+        Parameters
+        ----------
+        identifier : str
+            The ID of this component group. Must be unique within the entity.
+        namespace : str
+            The namespace of this component group. Not required.
+        skin_id : int
+            If used, a skin_id Component will be added to this component group
+            with the value of this parameter.
+        timer_len : float
+            If used with timer_event, a timer Component will be added to this
+            component group with a duration of timer_len. Does nothing
+            on its own.
+        timer_event : str
+            If used with timer_len, a timer Component will be adedd to this
+            component group which calls an event with ID timer_event when it
+            ends. Does nothing on its own. 
+        hp : int
+            If used, a health Component will be added to this component group,
+            setting the entity's maximum health hp the value of this parameter.
+        attack : int
+            If used, an attack Component will be added to this component group,
+            setting the entity's melee damage to the value of this parameter.
+        move_speed : float
+            If used, a movement Component will be added to this component
+            group, setting the entity's walkspeed to the value
+            of this parameter.
+        has_physics : bool
+            If True, a physics Component will be added to this component group,
+            making the entity affected by gravity and collisions, assuming it
+            doesn't already have a physics component.
+        no_damage : bool
+            If true, a damage_sensor Component set to deny all damage will be
+            added to this component group. The entity can still be killed with
+            /kill.
+        scale : float
+            If used, a scale Component will be added to this component group,
+            multiplying the visual and hitbox size of the entity by the value
+            of this parameter.
+        """
+        self.identifier: str = identifier
+        """The ID of this component group. Must be unique within the entity."""
+        self._namespace: str = namespace
+        """The namespace of this component group. Not required."""
+        self._components: list[Component] = []
+        """List of Component objects which comprise this component group."""
 
         if skin_id is not None:
             self.add_component(component_skin_id(skin_id))
@@ -1038,17 +1090,36 @@ class ComponentGroup:
             self.add_component(component_scale(scale))
 
     def add_component(self, comp: Component) -> None:
-        """Adds a Component to this component group"""
+        """
+        Adds a Component to this component group.
+        
+        Parameters
+        ----------
+        comp : Component
+            The Component to be added.
+        """
         self._components.append(comp)
 
     def add_component_list(self, comp_list: list[Component]) -> None:
-        """Adds a list of Components to this component group"""
+        """
+        Adds a list of Components to this component group.
+        
+        Parameters
+        ----------
+        comp : list[Component]
+            The Components to be added.
+        """
         for c in comp_list:
             self.add_component(c)
 
     def get_id(self) -> str:
         """
-        Returns the component group identifier with a namespace if it has one
+        Returns the component group identifier, with a namespace if it has one.
+
+        Returns
+        -------
+        str
+            The full ID of this component group.
         """
         if self._namespace is not None:
             return self._namespace + ':' + self.identifier
@@ -1057,8 +1128,13 @@ class ComponentGroup:
 
     def get_json(self) -> dict:
         """
-        Builds a JSON-ready dict of this component group which can be used 
-        in a Bedrock behavior pack behavior file
+        Builds a JSON-ready dict of this component group which can be used in
+        a behavior file.
+
+        Returns
+        -------
+        dict
+            A JSON-ready object representing this component group.
         """
         obj = {}
         for c in self._components:
