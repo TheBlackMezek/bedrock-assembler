@@ -15,6 +15,7 @@ from brockassemble.component import (
     component_collision_box
 )
 import copy
+from typing import Any
 
 
 RP_ENTITY_FORMAT_VERSION = '1.8.0'
@@ -1053,6 +1054,7 @@ class ComponentGroup:
             multiplying the visual and hitbox size of the entity by the value
             of this parameter.
         """
+
         self.identifier: str = identifier
         """The ID of this component group. Must be unique within the entity."""
         self._namespace: str = namespace
@@ -1144,28 +1146,56 @@ class ComponentGroup:
 
 class EntityProperty:
     """
-    Base class which stores data and generates a JSON dict for an entity 
-    property\n
-    Intended as a parent class, not for direct use
+    Base class which represents an entity property.
+
+    Intended as a parent class, not for direct use.
+
+    Attributes
+    ----------
+    identifier : str
     """
-    def __init__(self,
-                 identifier: str,
-                 default, # intentionally not hinted, can be a variety of types
-                 client_sync: bool = False) -> None:
+    def __init__(
+            self,
+            identifier: str,
+            default: Any,
+            client_sync: bool = False):
+        """
+        Parameters
+        ----------
+        identifier : str
+            The ID of this entity property. Must be unique within the entity.
+        default : Any
+            The default value of this entity property. Data type will depend
+            on the type of entity property this is.
+        client_sync : bool
+            Whether this entity property should be synced clientside, or only
+            tracked on the server.
+        """
+        
         self.identifier: str = identifier
-        """Name of this entity property"""
+        """The ID of this entity property. Must be unique within the entity."""
         self._values = None
-        """Possible values"""
+        """This entity property's range of possible values."""
         self._default = default
-        """Default value"""
+        """The default value of this entity property."""
         self._client_sync: bool = client_sync
-        """Should this entity property be synced to clientside?"""
+        """
+        Whether this entity property should be synced clientside, or only
+        tracked on the server.
+        """
         self._data_type: str = None
-        """Data type name"""
+        """The name of this entity property's data type."""
 
     def get_json(self) -> dict:
-        """Builds a JSON-ready dict of this entity property which can be used 
-        in a Bedrock behavior pack behavior file"""
+        """
+        Builds a JSON-ready dict of this entity property which can be used in
+        an entity behavior file.
+
+        Returns
+        -------
+        dict
+            A JSON-ready object representing this entity property.
+        """
         ret = {
             "values": self._values
         }
@@ -1178,21 +1208,47 @@ class EntityProperty:
 
 class PropertyRange(EntityProperty):
     """
-    Class which stores data and generates a JSON dict for an entity 
-    property with a range of possible integer values
+    Class which represents an entity property with a range of possible
+    integer values.
     """
-    def __init__(self,
-                 identifier: str,
-                 min: int,
-                 max: int,
-                 default: int,
-                 client_sync: bool = False) -> None:
+    def __init__(
+            self,
+            identifier: str,
+            min: int,
+            max: int,
+            default: int,
+            client_sync: bool = False):
+        """
+        Parameters
+        ----------
+        identifier : str
+            The ID of this entity property. Must be unique within the entity.
+        min : int
+            The minimum possible value of this entity property.
+        max : int
+            The maximium possible value of this entity property.
+        default : int
+            The default value of this entity property.
+        client_sync : bool
+            Whether this entity property should be synced clientside, or only
+            tracked on the server.
+        """
+
         super().__init__(identifier, default, client_sync)
         self._values = {
             "min": min,
             "max": max
         }
-        """Possible values"""
+        """
+        This entity property's range of possible values.
+
+        Values
+        ------
+        "min"
+            The minimum possible value.
+        "max"
+            The maximum possible value.
+        """
         self._data_type = 'int'
 
     def get_json(self) -> dict:
@@ -1208,35 +1264,70 @@ class PropertyRange(EntityProperty):
 
 class PropertyBool(EntityProperty):
     """
-    Class which stores data and generates a JSON dict for an entity 
-    property with possible values of True and False
+    Class which represents an entity property with possible values of
+    True and False.
     """
-    def __init__(self,
-                 identifier: str,
-                 default: bool,
-                 client_sync: bool = False) -> None:
+    def __init__(
+            self,
+            identifier: str,
+            default: bool,
+            client_sync: bool = False):
+        """
+        Parameters
+        ----------
+        identifier : str
+            The ID of this entity property. Must be unique within the entity.
+        default : bool
+            The default value of this entity property.
+        client_sync : bool
+            Whether this entity property should be synced clientside, or only
+            tracked on the server.
+        """
+
         super().__init__(identifier, default, client_sync)
         self._values = [
             False,
             True
         ]
-        'Possible values'
+        """
+        This entity property's range of possible values. As a bool property,
+        the only possible values are False and True.
+        """
         self._data_type = 'bool'
 
 
 class PropertyEnum(EntityProperty):
     """
-    Class which stores data and generates a JSON dict for an entity 
-    property with an arbitrary set of individual possible values
+    Class which represents an entity property with an arbitrary set of
+    individual possible values.
     """
-    def __init__(self,
-                 identifier: str,
-                 values: list,
-                 default, # intentionally not hinted, can be a variety of types
-                 client_sync: bool = False) -> None:
+    def __init__(
+            self,
+            identifier: str,
+            values: list[str | int],
+            default: str | int,
+            client_sync: bool = False):
+        """
+        Parameters
+        ----------
+        identifier : str
+            The ID of this entity property. Must be unique within the entity.
+        values : list[str | int]
+            The list of values which this entity property can have. This is an
+            arbitrary list, containing whatever values you'd like it to have.
+        default : str | int
+            The default value of this entity property.
+        client_sync : bool
+            Whether this entity property should be synced clientside, or only
+            tracked on the server.
+        """
+
         super().__init__(identifier, default, client_sync)
         self._values = values
-        """Possible values"""
+        """
+        This entity property's set of possible values. For an enum property,
+        this is an arbitrary list set by the user.
+        """
         self._data_type = 'enum'
 
 
