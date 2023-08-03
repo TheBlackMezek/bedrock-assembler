@@ -1333,44 +1333,74 @@ class PropertyEnum(EntityProperty):
 
 class Behaviors:
     """
-    Class which stores data and generates a JSON dict for an entity's 
-    behavior file
+    Class which represents an entity's behavior file.
+
+    Attributes
+    ----------
+    identifier : str
+    is_spawnable : bool
+    is_summonable : bool
+    is_experimental : bool
+    runtime_identifier : str
     """
     def __init__(
             self,
             identifier: str,
-            string_variables: dict=None,
-            runtime_identifier: str=None):
-        self.identifier = identifier
-        """ID of the entity, including namespace"""
-        self.is_spawnable = True
-        """Should this entity have a spawn egg?"""
-        self.is_summonable = True
-        """Should this entity be summonable with commands?"""
-        self.is_experimental = False
-        """Uncertain of usage, might enable experimental components"""
-        self._bancos = []
-        """The list of animation controller IDs which this entity uses"""
-        self._animations = []
-        """The list of behavior pack animation IDs which this entity uses"""
-        self.components = []
-        """The list of groupless Components in this entity"""
-        self.component_groups = []
-        """The list of ComponentGroups in this entity"""
-        self.events = []
-        """List of Events in this entity"""
-        self.spawn_groups = []
-        """List of component group IDs added to the entity on spawn"""
-        self.spawn_randomizers = []
-        """List of EventRandomizers to be used in the spawn event"""
-        self.spawn_sequential_events = []
-        """List of sub-Events to be used in the spawn event"""
-        self.properties = []
-        """List of EntityProperties in this entity"""
-        self.spawn_properties = {}
-        """Dict of entity properties to set when the entity spawns.\n
+            string_variables: dict = None,
+            runtime_identifier: str = None):
+        """
+        Parameters
+        ----------
+        identifier : str
+            The unique ID of this entity, including namespace. If the entity
+            has graphics, it must match the ID of an EntityGraphics object,
+            representing an entity's resource file.
+        string_variables : dict
+            A set of string values to match and replace in this behavior JSON
+            file when it is written. Likely to be removed in future versions.
+        runtime_identifier : str
+            The ID of a vanilla Bedrock entity to inherit from. The effects of
+            this vary widely depending on the parent entity.
+        """
+
+        self.identifier: str = identifier
+        """The unique ID of this entity, including namespace."""
+        self.is_spawnable: bool = True
+        """If True, this entity will have a spawn egg."""
+        self.is_summonable: bool = True
+        """If True, this entity will be summonable with commands."""
+        self.is_experimental: bool = False
+        """Uncertain of usage, might enable experimental components."""
+        self._bancos: list[str] = []
+        """The IDs of the animation controllers which this entity uses."""
+        self._animations: list[Animation] = []
+        """The behavior pack animations which this entity uses."""
+        self._components: list[Component] = []
+        """
+        The Components in this entity which are not part of a component group,
+        and thus always active.
+        """
+        self._component_groups: list[ComponentGroup] = []
+        """The list of ComponentGroups in this entity."""
+        self._events: list[Event] = []
+        """List of Events in this entity."""
+        self._spawn_groups: list[str] = []
+        """
+        The IDs of the component groups which are added to the entity
+        when it spawns.
+        """
+        self._spawn_randomizers: list[EventRandomizer] = []
+        """The EventRandomizers to be used in the spawn event."""
+        self._spawn_sequential_events: list[Event] = []
+        """The sub-Events to be used in the spawn event."""
+        self._properties: list[EntityProperty] = []
+        """List of EntityProperties in this entity."""
+        self._spawn_properties = {}
+        """
+        Initial values of this entity's entity properties to set
+        when it spawns.\n
         Each key is the ID of an entity property, 
-        and each value is what the property will be set to,"""
+        and each value is what the property will be set to."""
         self._lstate_names = {}
         """
         Dict to facilitate connection of nonlinear loop states.\n
@@ -1379,31 +1409,42 @@ class Behaviors:
         identifier for the named lstate. The rest of the elements are the IDs 
         of states which connect to it.
         """
-        self.string_variables = string_variables
-        """A dict of string key-value pairs """
+        self._string_variables = string_variables
+        """
+        A dict of key-value string pairs. These are searched for and replaced
+        in the entity JSON file when it's generated. Likely to be removed in a future version.
+        """
         self.runtime_identifier = runtime_identifier
-        """Vanilla entity ID to inherit from"""
+        """
+        The ID of a vanilla Bedrock entity to inherit from. The effects of
+        this vary widely depending on the parent entity.
+        """
 
     def get_json(self) -> dict:
         """
-        Builds a JSON-ready dict of these entity behaviors which can be 
-        written as a Bedrock behavior pack behavior file
+        Builds a JSON-ready dict of these entity behaviors.
+
+        Returns
+        -------
+        dict
+            A JSON-ready object which can be written as
+            an entity behavior file.
         """
         # Create vanilla spawn event
         if (
-            len(self.spawn_groups) > 0 or
-            len(self.spawn_randomizers) > 0 or
-            len(self.spawn_sequential_events) > 0 or
-            len(self.spawn_properties) > 0
+            len(self._spawn_groups) > 0 or
+            len(self._spawn_randomizers) > 0 or
+            len(self._spawn_sequential_events) > 0 or
+            len(self._spawn_properties) > 0
         ):
             spawn_event = self.get_event('minecraft:entity_spawned')
             if spawn_event is None:
                 spawn_event = Event('entity_spawned', namespace='minecraft')
-                self.events.append(spawn_event)
-            spawn_event.add_add_groups(self.spawn_groups)
-            spawn_event.add_randomizers(self.spawn_randomizers)
-            spawn_event.add_sequential_events(self.spawn_sequential_events)
-            spawn_event._set_properties = self.spawn_properties
+                self._events.append(spawn_event)
+            spawn_event.add_add_groups(self._spawn_groups)
+            spawn_event.add_randomizers(self._spawn_randomizers)
+            spawn_event.add_sequential_events(self._spawn_sequential_events)
+            spawn_event._set_properties = self._spawn_properties
 
         # Remove component groups from branching connections
         if len(self._lstate_names) > 0:
@@ -1437,28 +1478,28 @@ class Behaviors:
                 anim_dict[anim.identifier] = anim.identifier
         if len(anim_dict) > 0:
             desc['animations'] = anim_dict
-        if len(self.properties) > 0:
+        if len(self._properties) > 0:
             prop_obj = {}
-            for prop in self.properties:
+            for prop in self._properties:
                 prop_obj['property:'+prop.identifier] = prop.get_json()
             desc['properties'] = prop_obj
         entity_obj['description'] = desc
 
         # Make main bvr sections
         components = {}
-        for c in self.components:
+        for c in self._components:
             components['minecraft:' + c.comp_type] = c.json_obj
         entity_obj['components'] = components
 
-        if len(self.component_groups) > 0:
+        if len(self._component_groups) > 0:
             component_groups = {}
-            for g in self.component_groups:
+            for g in self._component_groups:
                 component_groups[g.get_id()] = g.get_json()
             entity_obj['component_groups'] = component_groups
 
-        if len(self.events) > 0:
+        if len(self._events) > 0:
             events = {}
-            for e in self.events:
+            for e in self._events:
                 events[e.get_id()] = e.get_json()
             entity_obj['events'] = events
 
@@ -1471,37 +1512,81 @@ class Behaviors:
             obj = json.loads(s)
 
         # Resolve string variables
-        if self.string_variables is not None:
-            replace_obj_string_variables(obj, self.string_variables)
+        if self._string_variables is not None:
+            replace_obj_string_variables(obj, self._string_variables)
 
         # Behavior creation complete
         return obj
 
     def add_banco(self, banco: str) -> None:
-        """Add a behavior pack animation controller ID"""
+        """
+        Register a behavior animation controller for use by this entity.
+
+        Parameters
+        ----------
+        banco : str
+            The ID of the banco to use.
+        """
         self._bancos.append(banco)
 
     def add_animation(self, animation: Animation) -> None:
-        """Add a behavior pack animation"""
+        """
+        Add a behavior pack animation to this entity.
+
+        Parameters
+        ----------
+        animation : Animation
+            The animation to add.
+        """
         self._animations.append(animation)
 
-    def get_event(self, event_id) -> Event:
-        """Returns an Event if one of event_id ID is found, otherwise None"""
-        for i in self.events:
+    def get_event(self, event_id: str) -> Event | None:
+        """
+        Searches for an Event in this entity.
+
+        Parameters
+        ----------
+        event_id : str
+            The ID of the Event to search for.
+        
+        Returns
+        -------
+        Event | None
+            An Event if one with the ID event_id is found, otherwise None.
+        """
+        for i in self._events:
             if i.get_id() == event_id:
                 return i
         return None
 
     def add_property(self, prop: EntityProperty) -> None:
-        """Add an EntityProperty"""
-        self.properties.append(prop)
+        """
+        Add an EntityProperty to this entity.
 
-    def get_component(self, component_id) -> Component:
+        Parameters
+        ----------
+        prop : EntityProperty
+            The EntityProperty to add.
         """
-        Returns a Component if one of component_id ID is found, 
-        otherwise None
+        self._properties.append(prop)
+
+    def get_component(self, component_id) -> Component | None:
         """
-        for i in self.components:
+        Searches for an always-active (not inside a component group) Component
+        in this entity.
+
+        Parameters
+        ----------
+        component_id : str
+            The ID of the Component to search for.
+        
+        Returns
+        -------
+        Component | None
+            A Component if one with the ID component_id is found,
+            otherwise None.
+        """
+        for i in self._components:
             if i.comp_type == component_id:
                 return i
         return None
@@ -1849,17 +1934,17 @@ class Entity:
         return self.namespace + ':' + self.identifier
 
     def add_component(self, component):
-        self.behaviors.components.append(component)
+        self.behaviors._components.append(component)
 
     def add_component_list(self, comp_list):
         for c in comp_list:
             self.add_component(c)
 
     def add_component_group(self, group):
-        self.behaviors.component_groups.append(group)
+        self.behaviors._component_groups.append(group)
 
     def add_event(self, event):
-        self.behaviors.events.append(event)
+        self.behaviors._events.append(event)
 
     def create_banco(self, banco_name, initial_state=None):
         banco = AnimationController('controller.animation.' + self.identifier + '_' + banco_name,
@@ -1910,11 +1995,11 @@ class Entity:
         self.rancos[ranco_idx].add_state(state)
 
     def add_spawn_group(self, group):
-        self.behaviors.spawn_groups.append(group)
+        self.behaviors._spawn_groups.append(group)
 
     def add_spawn_groups(self, groups):
         for i in groups:
-            self.behaviors.spawn_groups.append(i)
+            self.behaviors._spawn_groups.append(i)
 
     def set_identifier(self, id):
         self.identifier = id
@@ -2005,7 +2090,7 @@ class Entity:
             self.rancos[ranco_id].get_state('init').add_transition(self.current_lstate(), 'query.skin_id=='+str(self.current_state))
 
         if self.current_state == 0 and set_properties is not None:
-            self.behaviors.spawn_properties.update(set_properties)
+            self.behaviors._spawn_properties.update(set_properties)
 
         event = Event(
             self.current_lstate(),
@@ -2016,7 +2101,7 @@ class Entity:
             event._set_properties = set_properties
         self.add_event(event)
         if last_state:
-            for i in self.behaviors.events:
+            for i in self.behaviors._events:
                 if i.identifier == 'state_0':
                     i.remove_groups = [self.current_lstate()]
 
