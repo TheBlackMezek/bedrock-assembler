@@ -703,37 +703,81 @@ class EventRandomizer:
 
 
 class Event:
-    """Class which stores data and generates a JSON dict for an event"""
-    def __init__(self,
-                 identifier: str,
-                 namespace: str=None,
-                 add_groups: list[str]=None,
-                 remove_groups: list[str]=None,
-                 randomizers: list[EventRandomizer]=None,
-                 sequential_events: list['Event']=None,
-                 set_properties: list[list] = None):
-        """Format for set_properties is a list of lists,\n
-        [prop_id: str, value: any, optional no_quotes: bool]"""
+    """
+    Class which represents an event.
+
+    Attributes
+    ----------
+    identifier : str
+    namespace : str
+    """
+    def __init__(
+            self,
+            identifier: str,
+            namespace: str = None,
+            add_groups: list[str] = None,
+            remove_groups: list[str] = None,
+            randomizers: list[EventRandomizer] = None,
+            sequential_events: list['Event'] = None,
+            set_properties: list[list] = None,
+            next_event: str = None):
+        """
+        Parameters
+        ----------
+        identifier : str
+            The ID for this event. Must be unique within the behavior file.
+        namespace : str
+            The namespace for this event. Not required for custom events, but
+            hard-coded Bedrock events require the "minecraft" namespace.
+        add_groups : list[str]
+            IDs of component groups this event will add.
+        remove_groups : list[str]
+            IDs of component groups this event will remove.
+        randomizers : list[EventRandomizer]
+            List of EventRandomizers in this event. When the event is called,
+            one of these will be randomly selected, in addition to the normal
+            add and remove groups.
+        sequential_events : list[Event]
+            List of sub-Events which are sequentially executed by this event.
+        set_properties : list
+            Entity property values to set when this event is called.
+            Format for set_properties is a list of lists, where each sub-list
+            has this format:\n
+            [prop_id: str, value: any, optional no_quotes: bool]\n
+            By default, entity property values are treated like a string and
+            surrounded qith quotes. If no_quotes is used and set to True,
+            string values will instead have no quotes.
+        next_event : str
+            ID of another event which will be called after this one.
+        """
+
         self.identifier = identifier
-        """Name of the event"""
+        """The ID for this event. Must be unique within the behavior file."""
         self.namespace = namespace
-        """Namespace of the event"""
+        """
+        The namespace for this event. Not required for custom events, but
+        hard-coded Bedrock events require the "minecraft" namespace.
+        """
         self._add_groups = []
-        """IDs of component groups this event will add"""
+        """IDs of component groups this event will add."""
         self._remove_groups = []
-        """IDs of component groups this event will remove"""
+        """IDs of component groups this event will remove."""
         self._randomizers = []
-        """List of EventRandomizers in this event"""
+        """
+        List of EventRandomizers in this event. When the event is called,
+        one of these will be randomly selected, in addition to the normal
+        add and remove groups.
+        """
         self._sequential_events = []
-        """List of sub-Events which are sequentially executed in this event"""
+        """List of sub-Events which are sequentially executed in this event."""
         self._set_properties = {}
         """
         A dict of entity property alterations. Takes the form of:\n
-        key = entity property ID\n
-        value = what to set the entity property to
+        key = Entity property ID.\n
+        value = What to set the entity property to.
         """
         self._next_event = None
-        """ID of an event which will be called after this one"""
+        """ID of another event which will be called after this one."""
 
         if add_groups is not None:
             self.add_add_groups(add_groups)
@@ -748,47 +792,99 @@ class Event:
                 self.add_set_property(*s)
 
     def add_add_group(self, group: str) -> None:
-        """Adds a component group ID to be added when this event is called"""
+        """
+        Sets another component group to be added when this event is called.
+        
+        Parameters
+        ----------
+        group : str
+            The ID of the component group to be added.
+        """
         self._add_groups.append(group)
 
     def add_add_groups(self, groups: list[str]) -> None:
-        """Adds a list of component group IDs to be added when 
-        this event is called"""
+        """
+        Add a list of component groups to be added when this event is called.
+        
+        Parameters
+        ----------
+        groups : list[str]
+            The IDs of the component groups to be added.
+        """
         for i in groups:
             self._add_groups.append(i)
 
     def add_remove_group(self, group: str) -> None:
-        """Adds a component group ID to be removed when this event is called"""
+        """
+        Sets another component group to be removed when this event is called.
+        
+        Parameters
+        ----------
+        group : str
+            The ID of the component group to be removed.
+        """
         self._remove_groups.append(group)
 
     def add_remove_groups(self, groups: list[str]) -> None:
         """
-        Adds a list of component group IDs to be removed when 
-        this event is called
+        Add a list of component groups to be removed when this event is called.
+        
+        Parameters
+        ----------
+        groups : list[str]
+            The IDs of the component groups to be removed.
         """
         for i in groups:
             self._remove_groups.append(i)
 
     def add_randomizer(self, r: EventRandomizer) -> None:
-        """Adds an EventRandomizer to this event"""
+        """
+        Add a randomization option to this event, which will be added to the
+        pool of other EventRandomizers to be selected from when this event is
+        called.
+        
+        Parameters
+        ----------
+        r : EventRandomizer
+            The EventRandomizer to be added.
+        """
         self._randomizers.append(r)
 
     def add_randomizers(self, r: list[EventRandomizer]) -> None:
-        """Adds a list of EventRandomizers to this event"""
+        """
+        Add a list of randomization options to this event, which will be added
+        to the pool of other EventRandomizers to be selected from when this
+        event is called.
+        
+        Parameters
+        ----------
+        r : list[EventRandomizer]
+            The EventRandomizers to be added.
+        """
         for i in r:
             self._randomizers.append(i)
 
     def add_sequential_event(self, r: 'Event') -> None:
         """
-        Appends a sub-Event to a list of sub-Events which will be
-        executed in sequence within this Event
+        Appends a sub-Event to the list of sub-Events which will be
+        executed in sequence when this Event is called.
+        
+        Parameters
+        ----------
+        r : Event
+            The Event to be added.
         """
         self._sequential_events.append(r)
 
     def add_sequential_events(self, r: list['Event']) -> None:
         """
-        Appends a list of sub-Events to a list of sub-Events which will be 
-        executed in sequence within this Event
+        Appends a list of sub-Events to the list of sub-Events which will be
+        executed in sequence when this Event is called.
+        
+        Parameters
+        ----------
+        r : list[Event]
+            The Events to be added.
         """
         for i in r:
             self._sequential_events.append(i)
@@ -799,16 +895,26 @@ class Event:
             value,
             no_quotes: bool = False) -> None:
         """
-        Adds an entity property change to this Event\n
-        if no_quotes is false, string values will be surrounded by single
-        quotes, e.g. \'new value\'
+        Make this event set an additional entity property value when it is
+        called.
+
+        Parameters
+        ----------
+        prop_id : str
+            The ID of the entity property to be set.
+        value : any
+            The value which the entity property will be set to.
+        no_quotes : bool
+            Whether the value should be surrounded by quotes
+            (treated like a string). If no_quotes is false, string values will
+            be surrounded by single quotes, e.g. \'new value\'.
         """
         if type(value) is str and not no_quotes:
             value = f"'{value}'"
         self._set_properties['property:'+prop_id] = value
 
     def get_id(self) -> str:
-        """Returns the event identifier with a namespace if it has one"""
+        """Returns the event identifier, with a namespace if it has one."""
         if self.namespace is not None:
             return self.namespace + ':' + self.identifier
         else:
@@ -816,8 +922,13 @@ class Event:
 
     def get_json(self) -> dict:
         """
-        Builds a JSON-ready dict of this event which can be used in a 
-        Bedrock behavior pack behavior file
+        Builds a JSON-ready dict of this event option which can be used in
+        a behavior file.
+
+        Returns
+        -------
+        dict
+            A JSON-ready object representing this event.
         """
         obj = {}
         # Randomizers need to be nested in a sequence
