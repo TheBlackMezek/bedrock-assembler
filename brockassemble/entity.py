@@ -1412,7 +1412,8 @@ class Behaviors:
         self._string_variables = string_variables
         """
         A dict of key-value string pairs. These are searched for and replaced
-        in the entity JSON file when it's generated. Likely to be removed in a future version.
+        in the entity JSON file when it's generated. Likely to be removed in a
+        future version.
         """
         self.runtime_identifier = runtime_identifier
         """
@@ -1593,48 +1594,132 @@ class Behaviors:
 
 
 class AnimationController:
+    """
+    Class which represents an animation controller (anco), for use in either a
+    resource pack (ranco) or behavior pack (banco).
 
-    def __init__(self, identifier, initial_state='init', string_variables=None):
-        self.identifier = identifier
-        self.states = []
-        self.string_variables = string_variables
-        if initial_state is not None:
-            self.initial_state = initial_state
+    Attributes
+    ----------
+    identifier : str
+    initial_state : str
+    """
+    def __init__(
+            self,
+            identifier: str,
+            initial_state: str = 'init',
+            string_variables: dict = None):
+        """
+        Parameters
+        ----------
+        identifier : str
+            The unique ID of this animation controller.
+        initial_state : str
+            The ID of the AncoState which this anco will start in.
+        string_variables : dict
+            A set of string values to match and replace in this behavior JSON
+            file when it is written. Likely to be removed in future versions.
+        """
+
+        self.identifier: str = identifier
+        """The unique ID of this animation controller."""
+        self._states: list[AncoState] = []
+        """All of the anco states in this animation controller."""
+        self._string_variables: dict = string_variables
+        """
+        A dict of key-value string pairs. These are searched for and replaced
+        in the JSON file when it's generated. Likely to be removed in a
+        future version.
+        """
+        self.initial_state: str = initial_state
+        """The ID of the AncoState which this anco will start in."""
     
-    def get_json(self):
+    def get_json(self) -> dict:
+        """
+        Builds a JSON-ready dict of this animation controller.
+
+        Returns
+        -------
+        dict
+            A JSON-ready object which can be written as
+            an animation controller file.
+        """
         obj = {}
         obj['format_version'] = BANCO_FORMAT_VERSION
         banco = {}
         banco['initial_state'] = self.initial_state
         banco_states = {}
 
-        for i in self.states:
+        for i in self._states:
             banco_states[i.identifier] = i.get_json()
             
         banco['states'] = banco_states
         obj['animation_controllers'] = {}
         obj['animation_controllers'][self.identifier] = banco
 
-        if self.string_variables is not None:
-            replace_obj_string_variables(obj, self.string_variables)
+        if self._string_variables is not None:
+            replace_obj_string_variables(obj, self._string_variables)
 
         return obj
 
-    def add_state(self, state):
-        self.states.append(state)
+    def add_state(self, state: AncoState) -> None:
+        """
+        Add an AncoState to this entity.
+
+        Parameters
+        ----------
+        prop : AncoState
+            The AncoState to add.
+        """
+        self._states.append(state)
     
-    def add_states(self, states: list) -> None:
+    def add_states(self, states: list[AncoState]) -> None:
+        """
+        Add a set of AncoStates to this entity.
+
+        Parameters
+        ----------
+        prop : list[AncoState]
+            The AncoStates to add.
+        """
         for s in states:
             self.add_state(s)
     
-    def has_state(self, state_name):
-        for i in self.states:
+    def has_state(self, state_name: str) -> bool:
+        """
+        Checks whether an AncoState of state_name exists in this
+        animation controller.
+
+        Parameters
+        ----------
+        state_name : str
+            The ID of the AncoState to search for.
+        
+        Returns
+        -------
+        bool
+            True if an AncoState with state_name exists in this animation
+            controller, otherwise False.
+        """
+        for i in self._states:
             if i.identifier == state_name:
                 return True
         return False
      
-    def get_state(self, state_name):
-        for i in self.states:
+    def get_state(self, state_name: str) -> AncoState | None:
+        """
+        Searches for an AncoState in this animation controller.
+
+        Parameters
+        ----------
+        state_name : str
+            The ID of the AncoState to search for.
+        
+        Returns
+        -------
+        AncoState | None
+            An AncoState if one with the ID state_name is found, otherwise None.
+        """
+        for i in self._states:
             if i.identifier == state_name:
                 return i
         return None
