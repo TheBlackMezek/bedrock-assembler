@@ -3,6 +3,7 @@ Module containing functions for generating in-game commands
 and elements of commands.
 """
 
+
 def selector(
         base_selector: str,
         tags: list[str] = None,
@@ -57,7 +58,7 @@ def selector(
         If used with the x, y, z parameters, they set the corner of the box
         which dx, dy, dz stretch out from. For example, x=10 and dx=5 would
         create a bounding box with X axis boundaries of 10 and 15. Otherwise,
-        command caller's position is used. 
+        command caller's position is used.
     rotation_x, rotation_y : float | str
         Specify the direction the entity must be facing.
         Can be given as a specific value (x_rotation=50)
@@ -182,7 +183,7 @@ def _command_stem(
     include_slash : bool
         Whether or not the command begins with a forward slash '/'. This is
         necessary for some cases but will break others.
-    
+
     Returns
     -------
     str
@@ -235,7 +236,7 @@ def execute(
         The position at which to check for the block type.
         If floats, will use absolute coordinates.
         If strings, can use relative coordinates with tilde '~' notation.
-    
+
     Returns
     -------
     str
@@ -250,7 +251,8 @@ def execute(
         ret += ' '+detect_block
         ret += f' {detect_data_id}'
     ret += ' '+cmd
-    # Use the below code when Mojank implements the new /execute syntax for things other than the player
+    # Use the below code when Mojank implements the new /execute syntax
+    # for things other than the player
     # Also, replace the default '~' for x, y, z with None
     # ret = command_base('execute', None, include_slash)
     # if selector is not None:
@@ -319,7 +321,7 @@ def tp(
     include_slash : bool
         Whether or not the command begins with a forward slash '/'. This is
         necessary for some cases but will break others.
-    
+
     Returns
     -------
     str
@@ -385,7 +387,7 @@ def effect(
     include_slash : bool
         Whether or not the command begins with a forward slash '/'. This is
         necessary for some cases but will break others.
-    
+
     Returns
     -------
     str
@@ -482,7 +484,7 @@ def tag(
     include_slash : bool
         Whether or not the command begins with a forward slash '/'. This is
         necessary for some cases but will break others.
-    
+
     Returns
     -------
     str
@@ -525,7 +527,7 @@ def summon_rider(
     include_slash : bool
         Whether or not the command begins with a forward slash '/'. This is
         necessary for some cases but will break others.
-    
+
     Returns
     -------
     str
@@ -558,7 +560,7 @@ def event(
     include_slash : bool
         Whether or not the command begins with a forward slash '/'. This is
         necessary for some cases but will break others.
-    
+
     Returns
     -------
     str
@@ -583,7 +585,7 @@ def kill(
     include_slash : bool
         Whether or not the command begins with a forward slash '/'. This is
         necessary for some cases but will break others.
-    
+
     Returns
     -------
     str
