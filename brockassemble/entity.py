@@ -2784,29 +2784,78 @@ class Entity:
 
 
 def build_projectile(
-        id,
-        entity_graphics,
-        damage,
-        namespace='%namespace',
-        string_variables=None,
-        name=None,
-        collision_box_size=0.25,
-        knockback=True,
-        enflame=False,
-        spawn_entity=None,
-        spawn_chance=100.0,
-        spawn_count=1,
-        hit_sound='bow.hit',
-        stick_in_ground=False,
-        destroyed_on_hit=True,
-        spread=10,
-        power=1.0,
-        gravity=0.05,
-        remove_on_hit: bool = False) -> Entity:
+        id: str,
+        entity_graphics: EntityGraphics,
+        damage: int,
+        namespace: str,
+        string_variables: dict = None,
+        name: str = None,
+        collision_box_size: float = 0.25,
+        knockback: bool = True,
+        enflame: bool = False,
+        spawn_entity: str = None,
+        spawn_chance: float = 100.0,
+        spawn_count: int = 1,
+        hit_sound: str = 'bow.hit',
+        stick_in_ground: bool = False,
+        destroyed_on_hit: bool = True,
+        spread: int = 10,
+        power: float = 1.0,
+        gravity: float = 0.05,
+        remove_on_hit: bool = False
+    ) -> Entity:
     """
-    If used, spawn_entity must be the ID of a mob
-    (minus namespace, e.g. chicken instead of minecraft:chicken)
+    Creates an Entity which can be used as a projectile.
+
+    Parameters
+    ----------
+    id : str
+        The unique ID of this entity.
+    entity_graphics : EntityGraphics
+        The graphics definition of this projectile.
+    damage : int
+        How much damage this projectile will do on impact.
+        1 point is 1/2 heart.
+    namespace : str
+        The namespace this entity will use.
+    string_variables : dict
+        A set of string values to match and replace in this behavior JSON
+        file when it is written. Likely to be removed in future versions.
+    name : str
+        An optional display name for this entity. If not provided, it will just
+        use its ID.
+    collision_box_size : float
+        The size of this projectile's collision box. Applies to all 3 axes.
+    knockback : bool
+        If true, this projectile will induce knockback when it hits.
+    enflame : bool
+        If true, this projectile will set entities it hits on fire.
+    spawn_entity : str
+        The ID (not including namespace) of an entity to spawn when this
+        projectile impacts something.
+    spawn_chance : float
+        The percent change that spawn_entity will be spawned.
+    spawn_count : int
+        The number of spawn_entity to spawn on impact.
+    hit_sound : str
+        The sound this projectile will make when it hits something.
+    stick_in_ground : bool
+        If true, this projectile will persist in the block
+        it hits after impact.
+    destroyed_on_hit : bool
+        If true, this projectile will be deleted if it takes damage.
+    spread : int
+        The degree of randomness applied to this projectile's trajectory
+        when fired.
+    power : float
+        The speed this projectile is fired at.
+    gravity : float
+        How much gravity is applied to this projectile as it flies.
+    remove_on_hit : bool
+        Removes the projectile "on hit". Official documentation does not
+        explain what this does.
     """
+
     if name is None:
         name = id
     entity = Entity(
