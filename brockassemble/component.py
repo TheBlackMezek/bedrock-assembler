@@ -55,7 +55,7 @@ def component_family(families: list[str]) -> Component:
     ----------
     families : list[str]
         All of the families the entity will belong to.
-    
+
     Returns
     -------
     Component
@@ -77,7 +77,7 @@ def component_timer(length: float, event: str) -> Component:
         Duration that the timer will run for.
     event : str
         The event to call in the entity when the timer runs out.
-    
+
     Returns
     -------
     Component
@@ -100,7 +100,7 @@ def component_skin_id(skin_id: int) -> Component:
     ----------
     skin_id : int
         The skin ID number.
-    
+
     Returns
     -------
     Component
@@ -114,14 +114,14 @@ def component_skin_id(skin_id: int) -> Component:
 def component_variant(variant: int) -> Component:
     """
     Creates a variant component.\n
-    Variant is useful for sending data between entity files, 
+    Variant is useful for sending data between entity files,
     but entity properties are generally preferable.
 
     Parameters
     ----------
     variant : int
         The variant ID number.
-    
+
     Returns
     -------
     Component
@@ -135,14 +135,14 @@ def component_variant(variant: int) -> Component:
 def component_mark_variant(mark_variant: int) -> Component:
     """
     Creates a mark_variant component.\n
-    Mark_variant is useful for sending data between entity files, 
+    Mark_variant is useful for sending data between entity files,
     but entity properties are generally preferable.
 
     Parameters
     ----------
     mark_variant : int
         The mark_variant ID number.
-    
+
     Returns
     -------
     Component
@@ -164,7 +164,7 @@ def component_scale(scale: float) -> Component:
     ----------
     scale : float
         The number to multiply the entity's visual size and hitbox by.
-    
+
     Returns
     -------
     Component
@@ -185,7 +185,7 @@ def component_movement(speed: float) -> Component:
     ----------
     speed : float
         The walkspeed the entity will have.
-    
+
     Returns
     -------
     Component
@@ -198,8 +198,7 @@ def component_movement(speed: float) -> Component:
 
 def component_stroll(
         speed: float = 1.0,
-        priority: int = 5
-    ) -> Component:
+        priority: int = 5) -> Component:
     """
     Creates a behavior.random_stroll component.\n
     This behavior component causes the entity to wander around randomly.
@@ -211,7 +210,7 @@ def component_stroll(
     priority : int
         The priority of this behavior in the entity compared to other
         behaviors. Lower numbers are higher priority.
-    
+
     Returns
     -------
     Component
@@ -222,7 +221,7 @@ def component_stroll(
     return comp
 
 
-def component_random_look(priority: int=8) -> Component:
+def component_random_look(priority: int = 8) -> Component:
     """
     Creates a behavior.random_look_around component.\n
     This behavior component causes the entity to periodically rotate its head
@@ -233,23 +232,22 @@ def component_random_look(priority: int=8) -> Component:
     priority : int
         The priority of this behavior in the entity compared to other
         behaviors. Lower numbers are higher priority.
-    
+
     Returns
     -------
     Component
         A behavior.random_look_around Component.
     """
-    return(Component('behavior.random_look_around', priority=priority))
+    return (Component('behavior.random_look_around', priority=priority))
 
 
 def component_attack(
         dmg: int | list[int],
         effect_id: str = None,
-        effect_duration: float = None
-    ) -> Component:
+        effect_duration: float = None) -> Component:
     """
     Creates an attack component.\n
-    This component sets the properties of an entity's melee attack. 
+    This component sets the properties of an entity's melee attack.
     It does create targeting or movement to make attacks actually happen.\n
 
     Parameters
@@ -264,7 +262,7 @@ def component_attack(
         effect_duration must also be given if you use effect_id.
     effect_duration : float
         The length of time the potion effect will last, in seconds.
-    
+
     Returns
     -------
     Component
@@ -282,8 +280,7 @@ def component_attack(
 def component_melee_attack(
         speed_multiplier: float = None,
         track_target: bool = None,
-        reach_multiplier: float = None
-    ) -> Component:
+        reach_multiplier: float = None) -> Component:
     """
     Creates a behavior.melee_attack component.\n
     This component causes the entity to move towards its target and do melee
@@ -302,7 +299,7 @@ def component_melee_attack(
     reach_multiplier : float
         The melee attack range, muliplied from the entity's base size. If not
         supplied, the Bedrock default value is 2.0.
-    
+
     Returns
     -------
     Component
@@ -321,8 +318,7 @@ def component_melee_attack(
 def component_ranged_attack(
         attack_range: float = 15.0,
         interval_min: float = 1.0,
-        interval_max: float = 3.0
-    ) -> Component:
+        interval_max: float = 3.0) -> Component:
     """
     Creates a behavior.ranged_attack component.\n
     This component causes the entity to approach its target and shoot
@@ -338,7 +334,7 @@ def component_ranged_attack(
         Minimum time between shots. Randomized between interval_max.
     interval_max : float
         Maximum time between shots. Randomized between interval_min.
-    
+
     Returns
     -------
     Component
@@ -355,8 +351,7 @@ def component_ranged_attack(
 
 def component_area_attack(
         range: float,
-        dmg: int
-    ) -> Component:
+        dmg: int) -> Component:
     """
     Creates an area_attack component.\n
     This component deals damage to every entity within range every tick.
@@ -383,12 +378,12 @@ def component_health(max_hp: int):
     """
     Creates a health component.\n
     This sets the entity's max health. It is necessary for most mobs.
-    
+
     Parameters
     ----------
     max_hp : int
         The entity's maximum health. 1 point is 1/2 heart.
-    
+
     Returns
     -------
     Component
@@ -402,8 +397,7 @@ def component_health(max_hp: int):
 
 def component_collision_box(
         width: float,
-        height: float
-    ) -> Component:
+        height: float) -> Component:
     """
     Creates a collision box component.\n
     This sets the entity's collision box. It is necessary for most mobs.
@@ -472,8 +466,7 @@ def component_nav_generic(
         avoid_water: bool = True,
         can_pass_doors: bool = True,
         can_open_doors: bool = False,
-        avoid_damage_blocks: bool = True
-    ) -> Component:
+        avoid_damage_blocks: bool = True) -> Component:
     """
     Creates a navigation.generic component.\n
     This component allows the entity to pathfind walking, swimming, flying,
@@ -492,7 +485,7 @@ def component_nav_generic(
         If true, the entity can generate paths which go through closed doors.
     avoid_damage_blocks : bool
         If true, the entity will avoid blocks which cause damage.
-    
+
     Returns
     -------
     Component
@@ -510,8 +503,7 @@ def component_nav_generic(
 def component_rideable(
         seat_positions: list[list[float]],
         family_types: list[str],
-        pull_in_entities: bool = False
-    ) -> Component:
+        pull_in_entities: bool = False) -> Component:
     """
     Creates a rideable component.\n
     This component allows other entities to ride on this one, with uses ranging
@@ -523,14 +515,15 @@ def component_rideable(
     seat_positions : list[list[float]]
         The set of seats on this entity. Each seat is defined by its position
         within the entity, relative to the entity's "feet".
-        seat_positions is a list of three-float lists, representing coordinates.
+        seat_positions is a list of three-float lists,
+        representing coordinates.
         For example: [[0.0, 0.0, 0.0], [0.0, 0.5, 1.0]]
     family_types : list[str]
         The entity families which are allowed to ride this entity.
     pull_in_entities : bool
         If true, this entity will cause valid riders to enter an open seat
         if they touch.
-    
+
     Returns
     -------
     Component
@@ -543,7 +536,7 @@ def component_rideable(
     seat_list = []
     for s in seat_positions:
         seat_list.append({
-            'position':s
+            'position': s
         })
     comp.json_obj['seats'] = seat_list
     return comp
@@ -552,10 +545,9 @@ def component_rideable(
 def component_list_pathfinding(
         target_family: str,
         reached_event: str,
-        sensor_range: float = 3
-    ) -> list[Component]:
+        sensor_range: float = 3) -> list[Component]:
     """
-    Creates a set of Components which together make an entity walk 
+    Creates a set of Components which together make an entity walk
     towards a designated point.\n
     The target point must an entity with family target_family.\n
 
@@ -571,11 +563,11 @@ def component_list_pathfinding(
     sensor_range : float
         The maximum distance from the pathfinding target at which reached_event
         will be called.
-    
+
     Returns
     -------
     list[Component]
-        The Components returned are behavior.nearest_attackable_target, 
+        The Components returned are behavior.nearest_attackable_target,
         behavior.melee_attack, entity_sensor, and attack.
     """
     nat = Component('behavior.nearest_attackable_target')
@@ -598,11 +590,11 @@ def component_list_pathfinding(
         ]
     }
     att = component_attack(0)
-    #ranged = Component('behavior.ranged_attack')
-    #ranged.json_obj = {
-    #    "priority": 0,
-    #    "attack_radius": 1.0
-    #}
+    # ranged = Component('behavior.ranged_attack')
+    # ranged.json_obj = {
+    #     "priority": 0,
+    #     "attack_radius": 1.0
+    # }
     ranged = Component('behavior.melee_attack')
     ranged.json_obj = {
         "priority": 0,
@@ -612,7 +604,7 @@ def component_list_pathfinding(
     sensor.json_obj = {
         "event_filters": [
             {
-                "test":"is_family",
+                "test": "is_family",
                 "subject": "other",
                 "value": target_family
             }
@@ -646,8 +638,7 @@ def component_no_knockback() -> Component:
 
 def component_shooter(
         projectile: str,
-        potion_effect: int = None
-    ) -> Component:
+        potion_effect: int = None) -> Component:
     """
     Creates a shooter component.\n
     This component determines what kind of projectile an entity can shoot,
@@ -678,10 +669,9 @@ def component_shooter(
 
 def tag_sensor(
         tag: str,
-        event: str
-    ) -> Component:
+        event: str) -> Component:
     """
-    Creates an environment_sensor component which waits for the entity to 
+    Creates an environment_sensor component which waits for the entity to
     gain a specific tag, and then calls an event.\n
     For a sensor which can detect a variety of tags, use tag_sensor_list().
 
@@ -715,10 +705,9 @@ def tag_sensor(
 
 def tag_sensor_list(
         tags: list[str],
-        events: list[str]
-    ) -> Component:
+        events: list[str]) -> Component:
     """
-    Creates an environment_sensor component which waits for the entity to 
+    Creates an environment_sensor component which waits for the entity to
     gain any of a set of tags, and then calls the corresponding event.
 
     Parameters
@@ -729,7 +718,7 @@ def tag_sensor_list(
     events : list[str]
         The list of events which will be called when the tag in the
         corresponding position of the tags list is added to the entity.
-    
+
     Returns
     -------
     Component
@@ -740,7 +729,7 @@ def tag_sensor_list(
     comp.json_obj = {
         "triggers": []
     }
-    for n in range(0,len(tags)):
+    for n in range(0, len(tags)):
         obj = {
             "filters": {
                 "test": "has_tag",
