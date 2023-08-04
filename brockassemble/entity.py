@@ -102,20 +102,19 @@ def basic_bp_entity(id: str, namespace: str) -> dict:
 
 def _replace_list_string_variables(
         lst: list,
-        string_variables: dict
-    ) -> None:
+        string_variables: dict) -> None:
     """
-    Loops through all dict values and list elements in lst and replace every 
-    substring which matches a string_variables key prepended with % with the 
+    Loops through all dict values and list elements in lst and replace every
+    substring which matches a string_variables key prepended with % with the
     corresponding string_variables value.
 
-    For example, {'name': 'Foo'} would replace every substring '%name' in 
+    For example, {'name': 'Foo'} would replace every substring '%name' in
     every string dict value and list element with 'Foo'.
 
-    If string_variables value is not a string, can also replace an exact match 
+    If string_variables value is not a string, can also replace an exact match
     with the value.
 
-    For example, {'damage': 5} would replace '%damage' with 5, but 
+    For example, {'damage': 5} would replace '%damage' with 5, but
     'My damage is %damage' will produce an error.
 
     Parameters
@@ -125,22 +124,22 @@ def _replace_list_string_variables(
     string_variables : dict
         The string variable patterns to match and replace. See above for
         instructions.
-    
+
     Returns
     -------
     None
         Changes to lst are done in-place.
     """
-    for i in range(0,len(lst)):
+    for i in range(0, len(lst)):
         for s in string_variables:
             var_str = '%'+s
             if lst[i] == var_str:
                 lst[i] = string_variables[s]
-            elif type(lst[i]) == str and var_str in lst[i]:
+            elif type(lst[i]) is str and var_str in lst[i]:
                 lst[i] = lst[i].replace(var_str, string_variables[s])
-        if type(lst[i]) == dict:
+        if type(lst[i]) is dict:
             replace_obj_string_variables(lst[i], string_variables)
-        if type(lst[i]) == list:
+        if type(lst[i]) is list:
             _replace_list_string_variables(lst[i], string_variables)
 
 
@@ -148,17 +147,17 @@ def replace_obj_string_variables(
         obj: dict,
         string_variables: dict) -> None:
     """
-    Loop through all dict values and list elements in obj and replace every 
-    substring which matches a string_variables key prepended with % with the 
+    Loop through all dict values and list elements in obj and replace every
+    substring which matches a string_variables key prepended with % with the
     corresponding string_variables value.
 
-    For example, {'name': 'Foo'} would replace every substring '%name' in 
+    For example, {'name': 'Foo'} would replace every substring '%name' in
     every string dict value and list element with 'Foo'.
 
-    If string_variables value is not a string, can also replace an exact match 
+    If string_variables value is not a string, can also replace an exact match
     with the value.
 
-    For example, {'damage': 5} would replace '%damage' with 5, but 
+    For example, {'damage': 5} would replace '%damage' with 5, but
     'My damage is %damage' will produce an error.
 
     Parameters
@@ -168,7 +167,7 @@ def replace_obj_string_variables(
     string_variables : dict
         The string variable patterns to match and replace. See above for
         instructions.
-    
+
     Returns
     -------
     None
@@ -179,11 +178,11 @@ def replace_obj_string_variables(
             var_str = '%'+s
             if obj[i] == var_str:
                 obj[i] = string_variables[s]
-            elif type(obj[i]) == str and var_str in obj[i]:
+            elif type(obj[i]) is str and var_str in obj[i]:
                 obj[i] = obj[i].replace(var_str, string_variables[s])
-        if type(obj[i]) == dict:
+        if type(obj[i]) is dict:
             replace_obj_string_variables(obj[i], string_variables)
-        if type(obj[i]) == list:
+        if type(obj[i]) is list:
             _replace_list_string_variables(obj[i], string_variables)
 
 
@@ -209,7 +208,7 @@ class AnimTimelineItem:
             A list of commands which will be run at this point in the timeline.
             Note that this only works for behavior pack animations.
         """
-        
+
         self.trigger_time: float = trigger_time
         """The time in seconds when this timeline item will trigger."""
         self.commands: list[str] = commands
@@ -231,7 +230,7 @@ class AnimTimelineItem:
 
     def add_commands(self, cmds: list[str]) -> None:
         """
-        Adds a list of commands which will be run when this timeline 
+        Adds a list of commands which will be run when this timeline
         item is triggered.
 
         Parameters
@@ -362,7 +361,7 @@ class AnimationFile:
         """
         Parameters
         ----------
-        animations : list[Animation] 
+        animations : list[Animation]
             The list of animations contained in this file.
         """
 
@@ -395,7 +394,8 @@ class AnimationFile:
 
     def get_json(self) -> dict:
         """
-        Compile this object into a dict ready for writing as a JSON animation file.
+        Compile this object into a dict ready for writing
+        as a JSON animation file.
 
         Returns
         -------
@@ -423,11 +423,11 @@ class AncoState:
     def __init__(
             self,
             identifier: str,
-            entry_commands: list[str]=None,
-            exit_commands: list[str]=None,
-            transitions: list[list[str]]=None,
-            animations: list[str]=None,
-            transition_time: float=None):
+            entry_commands: list[str] = None,
+            exit_commands: list[str] = None,
+            transitions: list[list[str]] = None,
+            animations: list[str] = None,
+            transition_time: float = None):
         """
         Parameters
         ----------
@@ -494,7 +494,7 @@ class AncoState:
 
     def get_json(self) -> dict:
         """
-        Builds a JSON-ready dict of this anco state which can be used in an 
+        Builds a JSON-ready dict of this anco state which can be used in an
         animation controller.
 
         Returns
@@ -507,7 +507,7 @@ class AncoState:
         if len(self._transitions) > 0:
             transitions = []
             for i in self._transitions:
-                transitions.append({ i[0]:i[1] })
+                transitions.append({i[0]: i[1]})
             obj['transitions'] = transitions
 
         if len(self._on_entry) > 0:
@@ -604,7 +604,7 @@ class AncoState:
         Parameters
         ----------
         lst : list[list[str]]
-            lst is a list of 2-element lists. 
+            lst is a list of 2-element lists.
             lst[n][0] = state_id, lst[n][1] = condition_string\n
             Example: [
                 ['init', 'query.all_animations_finished'],\n
@@ -654,7 +654,7 @@ class EventRandomizer:
             Component group IDs to remove if
             this randomization option is chosen.
         set_properties : dict
-            Dict of entity properties to set if this randomization option is 
+            Dict of entity properties to set if this randomization option is
             chosen. Each key is an entity property ID, and each value is what
             that property will be set to.
         """
@@ -667,7 +667,9 @@ class EventRandomizer:
         there is now a 33/66 chance.
         """
         self._add_groups = add_groups
-        """Component group IDs to add if this randomization option is chosen."""
+        """
+        Component group IDs to add if this randomization option is chosen.
+        """
         self._remove_groups = remove_groups
         """
         Component group IDs to remove if
@@ -675,8 +677,8 @@ class EventRandomizer:
         """
         self._set_properties = set_properties
         """
-        Dict of entity properties to set if this randomization option is 
-        chosen. Each key is an entity property ID, and each value is what that 
+        Dict of entity properties to set if this randomization option is
+        chosen. Each key is an entity property ID, and each value is what that
         property will be set to.
         """
 
@@ -795,7 +797,7 @@ class Event:
     def add_add_group(self, group: str) -> None:
         """
         Sets another component group to be added when this event is called.
-        
+
         Parameters
         ----------
         group : str
@@ -806,7 +808,7 @@ class Event:
     def add_add_groups(self, groups: list[str]) -> None:
         """
         Add a list of component groups to be added when this event is called.
-        
+
         Parameters
         ----------
         groups : list[str]
@@ -818,7 +820,7 @@ class Event:
     def add_remove_group(self, group: str) -> None:
         """
         Sets another component group to be removed when this event is called.
-        
+
         Parameters
         ----------
         group : str
@@ -829,7 +831,7 @@ class Event:
     def add_remove_groups(self, groups: list[str]) -> None:
         """
         Add a list of component groups to be removed when this event is called.
-        
+
         Parameters
         ----------
         groups : list[str]
@@ -843,7 +845,7 @@ class Event:
         Add a randomization option to this event, which will be added to the
         pool of other EventRandomizers to be selected from when this event is
         called.
-        
+
         Parameters
         ----------
         r : EventRandomizer
@@ -856,7 +858,7 @@ class Event:
         Add a list of randomization options to this event, which will be added
         to the pool of other EventRandomizers to be selected from when this
         event is called.
-        
+
         Parameters
         ----------
         r : list[EventRandomizer]
@@ -869,7 +871,7 @@ class Event:
         """
         Appends a sub-Event to the list of sub-Events which will be
         executed in sequence when this Event is called.
-        
+
         Parameters
         ----------
         r : Event
@@ -881,7 +883,7 @@ class Event:
         """
         Appends a list of sub-Events to the list of sub-Events which will be
         executed in sequence when this Event is called.
-        
+
         Parameters
         ----------
         r : list[Event]
@@ -917,7 +919,7 @@ class Event:
     def get_id(self) -> str:
         """
         Returns the event identifier, with a namespace if it has one.
-        
+
         Returns
         -------
         str
@@ -1030,7 +1032,7 @@ class ComponentGroup:
         timer_event : str
             If used with timer_len, a timer Component will be adedd to this
             component group which calls an event with ID timer_event when it
-            ends. Does nothing on its own. 
+            ends. Does nothing on its own.
         hp : int
             If used, a health Component will be added to this component group,
             setting the entity's maximum health hp the value of this parameter.
@@ -1094,7 +1096,7 @@ class ComponentGroup:
     def add_component(self, comp: Component) -> None:
         """
         Adds a Component to this component group.
-        
+
         Parameters
         ----------
         comp : Component
@@ -1105,7 +1107,7 @@ class ComponentGroup:
     def add_component_list(self, comp_list: list[Component]) -> None:
         """
         Adds a list of Components to this component group.
-        
+
         Parameters
         ----------
         comp : list[Component]
@@ -1171,7 +1173,7 @@ class EntityProperty:
             Whether this entity property should be synced clientside, or only
             tracked on the server.
         """
-        
+
         self.identifier: str = identifier
         """The ID of this entity property. Must be unique within the entity."""
         self._values = None
@@ -1399,14 +1401,14 @@ class Behaviors:
         """
         Initial values of this entity's entity properties to set
         when it spawns.\n
-        Each key is the ID of an entity property, 
+        Each key is the ID of an entity property,
         and each value is what the property will be set to."""
         self._lstate_names = {}
         """
         Dict to facilitate connection of nonlinear loop states.\n
         Each key is an arbitrary name given to an lstate.\n
-        Each value is a list of strings. Element 0 is always the true 
-        identifier for the named lstate. The rest of the elements are the IDs 
+        Each value is a list of strings. Element 0 is always the true
+        identifier for the named lstate. The rest of the elements are the IDs
         of states which connect to it.
         """
         self._string_variables = string_variables
@@ -1470,9 +1472,9 @@ class Behaviors:
         desc['is_experimental'] = self.is_experimental
         anim_dict = {}
         if len(self._bancos) > 0:
-            desc['scripts'] = { 'animate': [] }
-            for n in range(0,len(self._bancos)):
-                desc['scripts']['animate'].append({f'banco_{n}':'1'})
+            desc['scripts'] = {'animate': []}
+            for n in range(0, len(self._bancos)):
+                desc['scripts']['animate'].append({f'banco_{n}': '1'})
                 anim_dict[f'banco_{n}'] = self._bancos[n]
         if len(self._animations) > 0:
             for anim in self._animations:
@@ -1549,7 +1551,7 @@ class Behaviors:
         ----------
         event_id : str
             The ID of the Event to search for.
-        
+
         Returns
         -------
         Event | None
@@ -1580,7 +1582,7 @@ class Behaviors:
         ----------
         component_id : str
             The ID of the Component to search for.
-        
+
         Returns
         -------
         Component | None
@@ -1632,7 +1634,7 @@ class AnimationController:
         """
         self.initial_state: str = initial_state
         """The ID of the AncoState which this anco will start in."""
-    
+
     def get_json(self) -> dict:
         """
         Builds a JSON-ready dict of this animation controller.
@@ -1651,7 +1653,7 @@ class AnimationController:
 
         for i in self._states:
             banco_states[i.identifier] = i.get_json()
-            
+
         banco['states'] = banco_states
         obj['animation_controllers'] = {}
         obj['animation_controllers'][self.identifier] = banco
@@ -1671,7 +1673,7 @@ class AnimationController:
             The AncoState to add.
         """
         self._states.append(state)
-    
+
     def add_states(self, states: list[AncoState]) -> None:
         """
         Add a set of AncoStates to this entity.
@@ -1683,7 +1685,7 @@ class AnimationController:
         """
         for s in states:
             self.add_state(s)
-    
+
     def has_state(self, state_name: str) -> bool:
         """
         Checks whether an AncoState of state_name exists in this
@@ -1693,7 +1695,7 @@ class AnimationController:
         ----------
         state_name : str
             The ID of the AncoState to search for.
-        
+
         Returns
         -------
         bool
@@ -1704,7 +1706,7 @@ class AnimationController:
             if i.identifier == state_name:
                 return True
         return False
-     
+
     def get_state(self, state_name: str) -> AncoState | None:
         """
         Searches for an AncoState in this animation controller.
@@ -1713,7 +1715,7 @@ class AnimationController:
         ----------
         state_name : str
             The ID of the AncoState to search for.
-        
+
         Returns
         -------
         AncoState | None
@@ -1874,7 +1876,7 @@ class EntityGraphics:
         animations. Each value is the ID of a particle.
         """
 
-        self.texture_path : str | dict
+        self.texture_path: str | dict
         """
         The file path of the texture this entity will use. Can also be a
         dict of possible textures, allowing for runtime texture switching.
@@ -1888,9 +1890,10 @@ class EntityGraphics:
         elif type(texture_path) is dict:
             self.texture_path = texture_path
             for key in self.texture_path.keys():
-                self.texture_path[key] = 'textures/entity/' + self.texture_path[key]
+                p = self.texture_path[key]
+                self.texture_path[key] = 'textures/entity/' + p
 
-        self.geo : str | dict
+        self.geo: str | dict
         """
         The ID of the geometry this entity will use. Can be a
         dict of possible geometries, allowing for runtime geo switching.
@@ -1921,7 +1924,7 @@ class EntityGraphics:
             self.anim_obj = anim_obj
         else:
             self.anim_obj.update(anim_obj)
-    
+
     def add_particles(self, obj: dict) -> None:
         """
         Add particles to be usable by this entity.
@@ -2001,57 +2004,63 @@ class EntityGraphics:
         variable-setting Molang expressions, which set the entity up to use
         vanilla humanoid animations.
         """
+        root_a = 'animation.'
+        root_p = 'animation.player.'
+        root_pf = 'animation.player.first_person.'
+        root_h = 'animation.humanoid.'
+        root_c = 'controller.animation.'
+        root_cp = 'controller.animation.player.'
         self.add_animations({
-            "root": "controller.animation.humanoid.root",
-            "base_controller": "controller.animation.player.base",
-            "hudplayer":  "controller.animation.humanoid.hudplayer",
-            "humanoid_base_pose": "animation.humanoid.base_pose",
-            "look_at_target": "controller.animation.humanoid.look_at_target",
-            "look_at_target_ui": "animation.player.look_at_target.ui",
-            "look_at_target_default": "animation.humanoid.look_at_target.default",
-            "look_at_target_gliding": "animation.humanoid.look_at_target.gliding",
-            "look_at_target_swimming": "animation.humanoid.look_at_target.swimming",
-            "look_at_target_inverted": "animation.player.look_at_target.inverted",
-            "cape": "animation.player.cape",
-            "move.arms": "animation.player.move.arms",
-            "move.legs": "animation.player.move.legs",
-            "swimming": "animation.player.swim",
-            "swimming.legs": "animation.player.swim.legs",
-            "riding.arms": "animation.player.riding.arms",
-            "riding.legs": "animation.player.riding.legs",
-            "holding": "animation.player.holding",
-            "brandish_spear": "animation.humanoid.brandish_spear",
-            "charging": "animation.humanoid.charging",
-            "attack.positions": "animation.player.attack.positions",
-            "attack.rotations": "animation.player.attack.rotations",
-            "sneaking": "animation.player.sneaking",
-            "bob": "animation.player.bob",
-            "damage_nearby_mobs": "animation.humanoid.damage_nearby_mobs",
-            "fishing_rod": "animation.humanoid.fishing_rod",
-            "use_item_progress": "animation.humanoid.use_item_progress",
-            "skeleton_attack": "animation.skeleton.attack",
-            "sleeping": "animation.player.sleeping",
-            "first_person_base_pose": "animation.player.first_person.base_pose",
-            "first_person_empty_hand": "animation.player.first_person.empty_hand",
-            "first_person_swap_item": "animation.player.first_person.swap_item",
-            "first_person_attack_controller": "controller.animation.player.first_person_attack",
-            "first_person_attack_rotation": "animation.player.first_person.attack_rotation",
-            "first_person_attack_rotation_item": "animation.player.first_person.attack_rotation",
-            "first_person_vr_attack_rotation": "animation.player.first_person.vr_attack_rotation",
-            "first_person_walk": "animation.player.first_person.walk",
-            "first_person_map_controller": "controller.animation.player.first_person_map",
-            "first_person_map_hold": "animation.player.first_person.map_hold",
-            "first_person_map_hold_attack": "animation.player.first_person.map_hold_attack",
-            "first_person_map_hold_off_hand": "animation.player.first_person.map_hold_off_hand",
-            "first_person_map_hold_main_hand": "animation.player.first_person.map_hold_main_hand",
-            "first_person_crossbow_equipped": "animation.player.first_person.crossbow_equipped",
-            "third_person_crossbow_equipped": "animation.player.crossbow_equipped",
-            "third_person_bow_equipped": "animation.player.bow_equipped",
-            "crossbow_hold": "animation.player.crossbow_hold",
-            "crossbow_controller": "controller.animation.player.crossbow",
-            "shield_block_main_hand": "animation.player.shield_block_main_hand",
-            "shield_block_off_hand": "animation.player.shield_block_off_hand",
-            "blink": "controller.animation.persona.blink"
+            "root": root_c+"humanoid.root",
+            "base_controller": root_cp+"base",
+            "hudplayer":  root_c+"humanoid.hudplayer",
+            "humanoid_base_pose": root_h+"base_pose",
+            "look_at_target": root_c+"humanoid.look_at_target",
+            "look_at_target_ui": root_p+"look_at_target.ui",
+            "look_at_target_default": root_h+"look_at_target.default",
+            "look_at_target_gliding": root_h+"look_at_target.gliding",
+            "look_at_target_swimming": root_h+"look_at_target.swimming",
+            "look_at_target_inverted": root_p+"look_at_target.inverted",
+            "cape": root_p+"cape",
+            "move.arms": root_p+"move.arms",
+            "move.legs": root_p+"move.legs",
+            "swimming": root_p+"swim",
+            "swimming.legs": root_p+"swim.legs",
+            "riding.arms": root_p+"riding.arms",
+            "riding.legs": root_p+"riding.legs",
+            "holding": root_p+"holding",
+            "brandish_spear": root_h+"brandish_spear",
+            "charging": root_h+"charging",
+            "attack.positions": root_p+"attack.positions",
+            "attack.rotations": root_p+"attack.rotations",
+            "sneaking": root_p+"sneaking",
+            "bob": root_p+"bob",
+            "damage_nearby_mobs": root_h+"damage_nearby_mobs",
+            "fishing_rod": root_h+"fishing_rod",
+            "use_item_progress": root_h+"use_item_progress",
+            "skeleton_attack": root_a+"skeleton.attack",
+            "sleeping": root_p+"sleeping",
+            "first_person_base_pose": root_pf+"base_pose",
+            "first_person_empty_hand": root_pf+"empty_hand",
+            "first_person_swap_item": root_pf+"swap_item",
+            "first_person_attack_controller": root_cp+"first_person_attack",
+            "first_person_attack_rotation": root_pf+"attack_rotation",
+            "first_person_attack_rotation_item": root_pf+"attack_rotation",
+            "first_person_vr_attack_rotation": root_pf+"vr_attack_rotation",
+            "first_person_walk": root_pf+"walk",
+            "first_person_map_controller": root_cp+"first_person_map",
+            "first_person_map_hold": root_pf+"map_hold",
+            "first_person_map_hold_attack": root_pf+"map_hold_attack",
+            "first_person_map_hold_off_hand": root_pf+"map_hold_off_hand",
+            "first_person_map_hold_main_hand": root_pf+"map_hold_main_hand",
+            "first_person_crossbow_equipped": root_pf+"crossbow_equipped",
+            "third_person_crossbow_equipped": root_p+"crossbow_equipped",
+            "third_person_bow_equipped": root_p+"bow_equipped",
+            "crossbow_hold": root_p+"crossbow_hold",
+            "crossbow_controller": root_cp+"crossbow",
+            "shield_block_main_hand": root_p+"shield_block_main_hand",
+            "shield_block_off_hand": root_p+"shield_block_off_hand",
+            "blink": root_c+"persona.blink"
         })
         self.add_animate_list(['root'])
         self.add_script_initialize([
@@ -2069,8 +2078,17 @@ class EntityGraphics:
             "variable.leg_layer_visible = 1.0;",
             "variable.boot_layer_visible = 1.0;",
             "variable.chest_layer_visible = 1.0;",
-            "variable.attack_body_rot_y = Math.sin(360*Math.sqrt(variable.attack_time)) * 5.0;",
-            "variable.tcos0 = (math.cos(query.modified_distance_moved * 38.17) * query.modified_move_speed / variable.gliding_speed_value) * 57.3;"
+            (
+                "variable.attack_body_rot_y"
+                " = Math.sin(360*Math.sqrt(variable.attack_time))"
+                " * 5.0;"
+            ),
+            (
+                "variable.tcos0"
+                " = (math.cos(query.modified_distance_moved * 38.17)"
+                " * query.modified_move_speed / variable.gliding_speed_value)"
+                " * 57.3;"
+            )
         ])
 
     def get_json(self) -> dict:
@@ -2089,31 +2107,34 @@ class EntityGraphics:
         desc = {}
         desc['identifier'] = self.identifier
         if not self.invisible:
-            desc['materials'] = {'default':self.material}
+            desc['materials'] = {'default': self.material}
             desc['render_controllers'] = [self.render_controller]
 
             if type(self.geo) is str:
-                desc['geometry'] = {'default':self.geo}
+                desc['geometry'] = {'default': self.geo}
             elif type(self.geo) is dict:
                 desc['geometry'] = self.geo
 
             if type(self.texture_path) is str:
-                desc['textures'] = {'default':self.texture_path}
+                desc['textures'] = {'default': self.texture_path}
             elif type(self.texture_path) is dict:
                 desc['textures'] = self.texture_path
 
         else:
-            desc['geometry'] = {'default':'geometry.humanoid'}
+            desc['geometry'] = {'default': 'geometry.humanoid'}
 
-        desc['spawn_egg'] = {'base_color':self.egg_color_1,'overlay_color':self.egg_color_2}
-        
+        desc['spawn_egg'] = {
+            'base_color': self.egg_color_1,
+            'overlay_color': self.egg_color_2
+        }
+
         if self.anim_obj is not None:
             desc['animations'] = self.anim_obj
-        
+
         if self._particle_obj is not None:
             desc['particle_effects'] = self._particle_obj
 
-        script_obj = {'scale':str(self.scale)}
+        script_obj = {'scale': str(self.scale)}
         if self.animate_list is not None:
             script_obj['animate'] = self.animate_list
         if self.init_list is not None:
@@ -2122,7 +2143,7 @@ class EntityGraphics:
             script_obj['pre_animation'] = self.pre_anim
         desc['scripts'] = script_obj
 
-        obj['minecraft:client_entity'] = {'description':desc}
+        obj['minecraft:client_entity'] = {'description': desc}
 
         if self._string_variables is not None:
             replace_obj_string_variables(obj, self._string_variables)
@@ -2236,7 +2257,7 @@ class Entity:
         """The display name of this entity."""
         self._bancos: list[AnimationController] = []
         """All behavior pack animation controllers this entity uses."""
-        self._current_state=0
+        self._current_state = 0
         """The number of the currently active loop state."""
         self.rancos: list[AnimationController] = []
         """All resource pack animation controllers this entity uses."""
@@ -2607,8 +2628,7 @@ class Entity:
             animation: str = None,
             end_anim_with_state: bool = True,
             anim_blend_time: float = 0.2,
-            set_properties: dict = None
-        ) -> None:
+            set_properties: dict = None) -> None:
         """
         Parameters
         ----------
@@ -2623,7 +2643,8 @@ class Entity:
             Avoid adding redundant Components which are already added by using
             other parameters in this method.
         entry_commands : list[str]
-            The commands which will be executed when this loop state is entered.
+            The commands which will be executed when
+            this loop state is entered.
         exit_commands : list[str]
             The commands which will be executed when this loop state is exited.
         time_len : float
@@ -2668,7 +2689,7 @@ class Entity:
 
         group = ComponentGroup(
             self.current_lstate(),
-            skin_id = self._current_state
+            skin_id=self._current_state
         )
         if timer_len is not None:
             if timer_state is not None:
@@ -2678,7 +2699,10 @@ class Entity:
                 else:
                     connection_list.append(timer_state)
             elif not last_state:
-                group.add_component(component_timer(timer_len, self.next_lstate()))
+                group.add_component(component_timer(
+                    timer_len,
+                    self.next_lstate()
+                ))
             else:
                 group.add_component(component_timer(timer_len, 'state_0'))
         if hp is not None:
@@ -2688,14 +2712,17 @@ class Entity:
         if move_speed is not None:
             group.add_component(component_movement(move_speed))
         if no_damage:
-            group.add_component(component_no_dmg()) 
+            group.add_component(component_no_dmg())
         if components is not None:
             group.add_component_list(components)
         self.add_component_group(group)
 
         if entry_commands is not None or exit_commands is not None:
             banco_state = AncoState(self.current_lstate())
-            banco_state.add_transition('init', 'query.skin_id!='+str(self._current_state))
+            banco_state.add_transition(
+                'init',
+                'query.skin_id!='+str(self._current_state)
+            )
             if entry_commands is not None:
                 for i in entry_commands:
                     banco_state.add_entry_command(i)
@@ -2707,22 +2734,34 @@ class Entity:
             self._bancos[banco_id].initial_state = 'init'
             if not self._bancos[banco_id].has_state('init'):
                 self.add_banco_state(banco_id, AncoState('init'))
-            self._bancos[banco_id].get_state('init').add_transition(self.current_lstate(), 'query.skin_id=='+str(self._current_state))
+            self._bancos[banco_id].get_state('init').add_transition(
+                self.current_lstate(),
+                'query.skin_id=='+str(self._current_state)
+            )
 
         if animation is not None:
             ranco_state = AncoState(self.current_lstate())
             if end_anim_with_state:
-                ranco_state.add_transition('init', 'query.skin_id!='+str(self._current_state))
+                ranco_state.add_transition(
+                    'init',
+                    'query.skin_id!='+str(self._current_state)
+                )
             else:
-                ranco_state.add_transition('init', 'query.all_animations_finished')
+                ranco_state.add_transition(
+                    'init',
+                    'query.all_animations_finished'
+                )
             ranco_state.add_animation(animation)
-            ranco_state._transition_time=anim_blend_time
+            ranco_state._transition_time = anim_blend_time
             self.add_ranco_state(ranco_id, ranco_state)
 
             self.rancos[ranco_id].initial_state = 'init'
             if not self.rancos[ranco_id].has_state('init'):
                 self.add_ranco_state(ranco_id, AncoState('init'))
-            self.rancos[ranco_id].get_state('init').add_transition(self.current_lstate(), 'query.skin_id=='+str(self._current_state))
+            self.rancos[ranco_id].get_state('init').add_transition(
+                self.current_lstate(),
+                'query.skin_id=='+str(self._current_state)
+            )
 
         if self._current_state == 0 and set_properties is not None:
             self.behaviors._spawn_properties.update(set_properties)
@@ -2802,8 +2841,7 @@ def build_projectile(
         spread: int = 10,
         power: float = 1.0,
         gravity: float = 0.05,
-        remove_on_hit: bool = False
-    ) -> Entity:
+        remove_on_hit: bool = False) -> Entity:
     """
     Creates an Entity which can be used as a projectile.
 
@@ -2869,7 +2907,6 @@ def build_projectile(
         runtime_identifier='minecraft:arrow',
         despawnable=True
     )
-    #entity = Entity('%namespace', name, string_variables, id, collision_x=collision_box_size, collision_y=collision_box_size, entity_graphics=entity_graphics)
     projectile_component = Component('projectile')
     projectile_json_obj = {
         "on_hit": {
@@ -2880,7 +2917,7 @@ def build_projectile(
                 "destroy_on_hit": destroyed_on_hit
             },
         },
-        #"multiple_targets": not destroyed_on_hit,
+        # "multiple_targets": not destroyed_on_hit,
         "hit_sound": hit_sound,
         "power": power,
         "gravity": gravity,
@@ -2888,13 +2925,13 @@ def build_projectile(
         "uncertainty_multiplier": 0,
         "anchor": 1,
         "should_bounce": True,
-        #"stop_on_hurt": {},
-        "offset": [0,-0.1,0],
+        # "stop_on_hurt": {},
+        "offset": [0, -0.1, 0],
         "catch_fire": enflame
     }
 
     if stick_in_ground:
-        projectile_json_obj['on_hit']['stick_in_ground'] = {"shake_time":0.35}
+        projectile_json_obj['on_hit']['stick_in_ground'] = {"shake_time": 0.35}
     if spawn_entity is not None:
         projectile_json_obj['on_hit']['spawn_chance'] = {
             "spawn_definition": spawn_entity,
@@ -2905,20 +2942,19 @@ def build_projectile(
         projectile_json_obj['stop_on_hurt'] = {}
     if remove_on_hit:
         projectile_json_obj['on_hit']['remove_on_hit'] = {}
-    #     projectile_json_obj['on_hit']['remove_on_hit'] = {}
 
     projectile_component.json_obj = projectile_json_obj
     entity.add_component(projectile_component)
 
-    optimizer_component = Component('conditional_bandwidth_optimization')
-    optimizer_json_obj = {
-        "default_values": {
-          "max_optimized_distance": 80.0,
-          "max_dropped_ticks": 10,
-          "use_motion_prediction_hints": True
-        }
-    }
+    # optimizer_component = Component('conditional_bandwidth_optimization')
+    # optimizer_json_obj = {
+    #     "default_values": {
+    #       "max_optimized_distance": 80.0,
+    #       "max_dropped_ticks": 10,
+    #       "use_motion_prediction_hints": True
+    #     }
+    # }
 
-    #entity.add_component(optimizer_component)
+    # entity.add_component(optimizer_component)
 
     return entity
