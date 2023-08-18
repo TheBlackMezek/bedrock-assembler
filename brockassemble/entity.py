@@ -1920,10 +1920,10 @@ class EntityGraphics:
             the the animate list and animation controllers, and each value is
             the ID of an animation.
         """
-        if self.anim_obj is None:
-            self.anim_obj = anim_obj
+        if self._anim_obj is None:
+            self._anim_obj = anim_obj
         else:
-            self.anim_obj.update(anim_obj)
+            self._anim_obj.update(anim_obj)
 
     def add_particles(self, obj: dict) -> None:
         """
@@ -1952,10 +1952,10 @@ class EntityGraphics:
             the arbitrary names set in the entity resource file, not the actual
             IDs of the anims and ancos.
         """
-        if self.animate_list is None:
-            self.animate_list = animate_list
+        if self._animate_list is None:
+            self._animate_list = animate_list
         else:
-            self.animate_list.extend(animate_list)
+            self._animate_list.extend(animate_list)
 
     def add_script_initialize(self, init_list: list[str]) -> None:
         """
@@ -2128,15 +2128,15 @@ class EntityGraphics:
             'overlay_color': self.egg_color_2
         }
 
-        if self.anim_obj is not None:
-            desc['animations'] = self.anim_obj
+        if self._anim_obj is not None:
+            desc['animations'] = self._anim_obj
 
         if self._particle_obj is not None:
             desc['particle_effects'] = self._particle_obj
 
         script_obj = {'scale': str(self.scale)}
-        if self.animate_list is not None:
-            script_obj['animate'] = self.animate_list
+        if self._animate_list is not None:
+            script_obj['animate'] = self._animate_list
         if self.init_list is not None:
             script_obj['initialize'] = self.init_list
         if self.pre_anim is not None:
