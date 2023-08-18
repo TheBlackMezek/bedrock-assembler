@@ -2351,7 +2351,7 @@ class Entity:
         Returns
         -------
         str
-            The full ID of this event.
+            The full ID of this entity.
         """
         return self.namespace + ':' + self.identifier
 
