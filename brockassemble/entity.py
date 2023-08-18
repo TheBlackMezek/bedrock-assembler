@@ -1339,6 +1339,7 @@ class Behaviors:
 
     Attributes
     ----------
+    namespace : str
     identifier : str
     is_spawnable : bool
     is_summonable : bool
@@ -1347,16 +1348,19 @@ class Behaviors:
     """
     def __init__(
             self,
+            namespace: str,
             identifier: str,
             string_variables: dict = None,
             runtime_identifier: str = None):
         """
         Parameters
         ----------
+        namespace : str
+            The namespace of this entity.
         identifier : str
-            The unique ID of this entity, including namespace. If the entity
-            has graphics, it must match the ID of an EntityGraphics object,
-            representing an entity's resource file.
+            The unique ID of this entity. If the entity has graphics, it must
+            match the ID of an EntityGraphics object, representing an entity's
+            resource file.
         string_variables : dict
             A set of string values to match and replace in this behavior JSON
             file when it is written. Likely to be removed in future versions.
@@ -1365,8 +1369,10 @@ class Behaviors:
             this vary widely depending on the parent entity.
         """
 
+        self.namespace: str = namespace
+        """The namespace of this entity."""
         self.identifier: str = identifier
-        """The unique ID of this entity, including namespace."""
+        """The unique ID of this entity."""
         self.is_spawnable: bool = True
         """If True, this entity will have a spawn egg."""
         self.is_summonable: bool = True
@@ -1464,7 +1470,7 @@ class Behaviors:
         entity_obj = {}
         obj['minecraft:entity'] = entity_obj
         desc = {}
-        desc['identifier'] = self.identifier
+        desc['identifier'] = self.get_id()
         if self.runtime_identifier is not None:
             desc['runtime_identifier'] = self.runtime_identifier
         desc['is_spawnable'] = self.is_spawnable
@@ -1520,6 +1526,17 @@ class Behaviors:
 
         # Behavior creation complete
         return obj
+
+    def get_id(self) -> str:
+        """
+        Returns the complete entity identifier, including namespace.
+
+        Returns
+        -------
+        str
+            The full ID of this entity.
+        """
+        return self.namespace + ':' + self.identifier
 
     def add_banco(self, banco: str) -> None:
         """
@@ -1734,6 +1751,7 @@ class EntityGraphics:
 
     Attributes
     ----------
+    namespace : str
     identifier : str
     material : str
     render_controller : str
@@ -1744,6 +1762,7 @@ class EntityGraphics:
     """
     def __init__(
             self,
+            namespace: str,
             identifier: str,
             string_variables: dict = None,
             material: str = 'basic',
@@ -1759,10 +1778,11 @@ class EntityGraphics:
         """
         Parameters
         ----------
+        namespace : str
+            The namespace of this entity.
         identifier : str
-            The unique ID of this entity, including namespace. This must match
-            the ID of a Behaviors object, representing an entity's
-            behavior file.
+            The unique ID of this entity. This must match the ID of a Behaviors
+            object, representing an entity's behavior file.
         string_variables : dict
             A set of string values to match and replace in this behavior JSON
             file when it is written. Likely to be removed in future versions.
@@ -1811,11 +1831,12 @@ class EntityGraphics:
             animations. Each value is the ID of a particle.
         """
 
+        self.namespace: str = namespace
+        """The namespace of this entity."""
         self.identifier: str = identifier
         """
-        The unique ID of this entity, including namespace. This must match
-        the ID of a Behaviors object, representing an entity's
-        behavior file.
+        The unique ID of this entity. This must match the ID of a Behaviors
+        object, representing an entity's behavior file.
         """
         self.material: str = material
         """The ID of the material this entity will use for rendering."""
@@ -1908,6 +1929,17 @@ class EntityGraphics:
             self.geo = geo
             for key in self.geo.keys():
                 self.geo[key] = 'geometry.' + self.geo[key]
+
+    def get_id(self) -> str:
+        """
+        Returns the complete entity identifier, including namespace.
+
+        Returns
+        -------
+        str
+            The full ID of this entity.
+        """
+        return self.namespace + ':' + self.identifier
 
     def add_animations(self, anim_obj: dict) -> None:
         """
@@ -2105,7 +2137,7 @@ class EntityGraphics:
         obj['format_version'] = ENTITY_GRAPHICS_FORMAT_VERSION
 
         desc = {}
-        desc['identifier'] = self.identifier
+        desc['identifier'] = self.get_id()
         if not self.invisible:
             desc['materials'] = {'default': self.material}
             desc['render_controllers'] = [self.render_controller]
@@ -2159,6 +2191,7 @@ class Entity:
     Attributes
     ----------
     namespace : str
+    name : str
     """
     def __init__(
             self,
@@ -2311,7 +2344,8 @@ class Entity:
             self.graphics = entity_graphics
         elif has_graphics:
             self.graphics = EntityGraphics(
-                self.get_id(),
+                self.namespace,
+                self.identifier,
                 string_variables=self.string_variables,
                 invisible=invisible
             )
@@ -2319,7 +2353,8 @@ class Entity:
             self.graphics = None
 
         self.behaviors = Behaviors(
-            self.get_id(),
+            self.namespace,
+            self.identifier,
             self.string_variables,
             runtime_identifier
         )
@@ -2572,9 +2607,9 @@ class Entity:
             This entity's new ID.
         """
         self.identifier = id
-        self.behaviors.identifier = self.get_id()
+        self.behaviors.identifier = self.identifier
         if self.graphics is not None:
-            self.graphics.identifier = self.get_id()
+            self.graphics.identifier = self.identifier
 
     def current_lstate(self) -> str:
         """
