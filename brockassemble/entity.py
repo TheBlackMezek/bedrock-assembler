@@ -2192,6 +2192,13 @@ class Entity:
     ----------
     namespace : str
     name : str
+    ambient_sound : str
+    hurt_sound : str
+    death_sound : str
+    step_sound : str
+    sounds_pitch_range : list[float]
+    sounds_volume : float
+    egg_name : str
     """
     def __init__(
             self,
@@ -2292,18 +2299,18 @@ class Entity:
         """All behavior pack animation controllers this entity uses."""
         self._current_state = 0
         """The number of the currently active loop state."""
-        self.rancos: list[AnimationController] = []
+        self._rancos: list[AnimationController] = []
         """All resource pack animation controllers this entity uses."""
 
-        self.ambient_sound = ambient_sound
+        self.ambient_sound: str = ambient_sound
         """The ID of a sound this entity will play on occasion at random."""
-        self.hurt_sound = hurt_sound
+        self.hurt_sound: str = hurt_sound
         """The ID of a sound this entity will play when it takes damage."""
-        self.death_sound = death_sound
+        self.death_sound: str = death_sound
         """The ID of the sound this entity will play when it dies."""
-        self.step_sound = step_sound
+        self.step_sound: str = step_sound
         """The ID of a sound this entity will play as it walks."""
-        self.sounds_pitch_range = sounds_pitch_range
+        self.sounds_pitch_range: list[float] = sounds_pitch_range
         """
         The pitch range for all of this entity's sounds. Must be a list of
         two floats, a minimum and maximum value. For example:
@@ -2311,19 +2318,19 @@ class Entity:
         When a sound is played, it will be at a random pitch between these
         values.
         """
-        self.sounds_volume = sounds_volume
+        self.sounds_volume: float = sounds_volume
         """
         The volume to play all this entity's sounds at. How exactly this
         works is strange, so you may need to fiddle with it to get the
         results you need.
         """
 
-        self.identifier: str
+        self._identifier: str
         """The unique ID of this entity."""
         if id is not None:
-            self.identifier = id
+            self._identifier = id
         else:
-            self.identifier = name.lower().replace(' ', '_')
+            self._identifier = name.lower().replace(' ', '_')
 
         self.egg_name: str
         """The display name of this entity's spawn egg."""
@@ -2345,7 +2352,7 @@ class Entity:
         elif has_graphics:
             self.graphics = EntityGraphics(
                 self.namespace,
-                self.identifier,
+                self._identifier,
                 string_variables=self.string_variables,
                 invisible=invisible
             )
@@ -2354,7 +2361,7 @@ class Entity:
 
         self.behaviors = Behaviors(
             self.namespace,
-            self.identifier,
+            self._identifier,
             self.string_variables,
             runtime_identifier
         )
@@ -2388,7 +2395,7 @@ class Entity:
         str
             The full ID of this entity.
         """
-        return self.namespace + ':' + self.identifier
+        return self.namespace + ':' + self._identifier
 
     def add_component(self, component: Component) -> None:
         """
@@ -2456,7 +2463,7 @@ class Entity:
             The index of this banco within the Entity's banco list.
         """
         banco = AnimationController(
-            'controller.animation.' + self.identifier + '_' + banco_name,
+            'controller.animation.' + self._identifier + '_' + banco_name,
             initial_state=initial_state,
             string_variables=self.string_variables
         )
@@ -2511,18 +2518,18 @@ class Entity:
             The index of this ranco within the Entity's ranco list.
         """
         ranco = AnimationController(
-            'controller.animation.' + self.identifier + '_' + ranco_name,
+            'controller.animation.' + self._identifier + '_' + ranco_name,
             initial_state=initial_state,
             string_variables=self.string_variables
         )
-        self.rancos.append(ranco)
+        self._rancos.append(ranco)
 
         if self.graphics is not None:
             self.graphics.add_ranco(ranco)
         else:
             print('WARNING: ranco added to entity without graphics')
 
-        return len(self.rancos)-1
+        return len(self._rancos)-1
 
     def add_ranco(self, ranco: AnimationController) -> int:
         """
@@ -2538,12 +2545,12 @@ class Entity:
         int
             The index of this ranco within the Entity's ranco list.
         """
-        self.rancos.append(ranco)
+        self._rancos.append(ranco)
         if self.graphics is not None:
             self.graphics.add_ranco(ranco)
         else:
             print('WARNING: ranco added to entity without graphics')
-        return len(self.rancos)-1
+        return len(self._rancos)-1
 
     def add_banco_state(self, banco_idx: int, state: AncoState) -> None:
         """
@@ -2569,7 +2576,7 @@ class Entity:
         state : AncoState
             The animation controller state to add.
         """
-        self.rancos[ranco_idx].add_state(state)
+        self._rancos[ranco_idx].add_state(state)
 
     def add_spawn_group(self, group: str) -> None:
         """
@@ -2606,10 +2613,10 @@ class Entity:
         id : str
             This entity's new ID.
         """
-        self.identifier = id
-        self.behaviors.identifier = self.identifier
+        self._identifier = id
+        self.behaviors.identifier = self._identifier
         if self.graphics is not None:
-            self.graphics.identifier = self.identifier
+            self.graphics.identifier = self._identifier
 
     def current_lstate(self) -> str:
         """
@@ -2790,10 +2797,10 @@ class Entity:
             ranco_state._transition_time = anim_blend_time
             self.add_ranco_state(ranco_id, ranco_state)
 
-            self.rancos[ranco_id].initial_state = 'init'
-            if not self.rancos[ranco_id].has_state('init'):
+            self._rancos[ranco_id].initial_state = 'init'
+            if not self._rancos[ranco_id].has_state('init'):
                 self.add_ranco_state(ranco_id, AncoState('init'))
-            self.rancos[ranco_id].get_state('init').add_transition(
+            self._rancos[ranco_id].get_state('init').add_transition(
                 self.current_lstate(),
                 'query.skin_id=='+str(self._current_state)
             )
