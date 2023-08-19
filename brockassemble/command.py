@@ -408,11 +408,17 @@ def effect(
 
 def summon(
         entity_id: str,
-        name: str = None,
         x: str | float = None,
         y: str | float = None,
         z: str | float = None,
+        name: str = None,
         spawn_event: str = None,
+        y_rot: float = None,
+        x_rot: float = None,
+        facing_target: str = None,
+        facing_x: str | float = None,
+        facing_y: str | float = None,
+        facing_z: str | float = None,
         include_slash: bool = True) -> str:
     """
     Creates a command to summon an entity.
@@ -427,10 +433,36 @@ def summon(
         the summoner's position.
         If floats, will use absolute coordinates.
         If strings, can use relative coordinates with tilde '~' notation.
+        These must be provided for most versions of /summon that use additional
+        parameters.
+    name : str
+        A nametag to apply to the summoned entity. This parameter can be used
+        on its own, along with a summon position, or a summon position,
+        spawn event, and facing parameter.
+        It cannot be used, for example, with a facing parameter but no summon
+        position.
     spawn_event : str
         The specific event to be called on the entity when it spawns.
         If not provided, the Bedrock default is 'minecraft:entity_spawned'.
-        If you use spawn_event, you MUST also provide x, y, z.
+        If you use spawn_event, you MUST also use x, y, z and one of the facing
+        parameter sets.
+    y_rot, x_rot : float
+        The X and Y rotation for the summoned entity. If either is used, you
+        must also provide x, y, z. If x_rot is used, you must also use y_rot.
+        Can optionally have spawn_event or both spawn_event and name added.
+        Incompatible with other facing parameters.
+    facing_target : str
+        A target selector which determines what the summoned entity will be
+        facing when spawned. If used, you must also provide x, y, z.
+        Can optionally have spawn_event or both spawn_event and name added.
+        Incompatible with other facing parameters.
+    facing_x, facing_y, facing_z : str | float
+        A specific point in space the summoned entity will be facing when
+        spawned. If used, you must also provide x, y, z.
+        If floats, will use absolute coordinates.
+        If strings, can use relative coordinates with tilde '~' notation.
+        Can optionally have spawn_event or both spawn_event and name added.
+        Incompatible with other facing parameters.
     include_slash : bool
         Whether or not the command begins with a forward slash '/'. This is
         necessary for some cases but will break others.
@@ -443,17 +475,31 @@ def summon(
     """
     ret = _command_stem('summon', entity_id, include_slash)
 
-    if spawn_event is not None or name is None:
-        if x is not None:
-            ret += f' {x} {y} {z}'
-        if spawn_event is not None:
-            ret += ' '+spawn_event
-        if name is not None:
-            ret += f' "{name}"'
-    else:
+    uses_facing = False
+    if (
+        y_rot is not None or
+        facing_target is not None or
+        facing_x is not None
+    ):
+        uses_facing = True
+
+    if not uses_facing and name is not None:
         ret += f' "{name}"'
-        if x is not None:
-            ret += f' {x} {y} {z}'
+
+    if x is not None:
+        ret += f' {x} {y} {z}'
+
+        if y_rot is not None:
+            ret += f' {y_rot} {x_rot}'
+        elif facing_target is not None:
+            ret += f' facing {facing_target}'
+        elif facing_x is not None:
+            ret += f' facing {facing_x} {facing_y} {facing_z}'
+
+        if uses_facing and spawn_event is not None:
+            ret += f' {spawn_event}'
+            if name is not None:
+                ret += f' "{name}"'
 
     return ret
 
