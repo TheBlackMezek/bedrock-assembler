@@ -3,6 +3,10 @@
 
 ## Version 0.2.3 (unreleased)
 
+### Additions
+* Add pytest unit test folder
+* Add an initial test for _command_stem()
+
 
 ## Version 0.2.2 (2023-08-22)
 
