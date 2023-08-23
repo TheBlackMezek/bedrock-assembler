@@ -1339,6 +1339,7 @@ class Behaviors:
 
     Attributes
     ----------
+    namespace : str
     identifier : str
     is_spawnable : bool
     is_summonable : bool
@@ -1347,16 +1348,19 @@ class Behaviors:
     """
     def __init__(
             self,
+            namespace: str,
             identifier: str,
             string_variables: dict = None,
             runtime_identifier: str = None):
         """
         Parameters
         ----------
+        namespace : str
+            The namespace of this entity.
         identifier : str
-            The unique ID of this entity, including namespace. If the entity
-            has graphics, it must match the ID of an EntityGraphics object,
-            representing an entity's resource file.
+            The unique ID of this entity. If the entity has graphics, it must
+            match the ID of an EntityGraphics object, representing an entity's
+            resource file.
         string_variables : dict
             A set of string values to match and replace in this behavior JSON
             file when it is written. Likely to be removed in future versions.
@@ -1365,8 +1369,10 @@ class Behaviors:
             this vary widely depending on the parent entity.
         """
 
+        self.namespace: str = namespace
+        """The namespace of this entity."""
         self.identifier: str = identifier
-        """The unique ID of this entity, including namespace."""
+        """The unique ID of this entity."""
         self.is_spawnable: bool = True
         """If True, this entity will have a spawn egg."""
         self.is_summonable: bool = True
@@ -1464,7 +1470,7 @@ class Behaviors:
         entity_obj = {}
         obj['minecraft:entity'] = entity_obj
         desc = {}
-        desc['identifier'] = self.identifier
+        desc['identifier'] = self.get_id()
         if self.runtime_identifier is not None:
             desc['runtime_identifier'] = self.runtime_identifier
         desc['is_spawnable'] = self.is_spawnable
@@ -1520,6 +1526,17 @@ class Behaviors:
 
         # Behavior creation complete
         return obj
+
+    def get_id(self) -> str:
+        """
+        Returns the complete entity identifier, including namespace.
+
+        Returns
+        -------
+        str
+            The full ID of this entity.
+        """
+        return self.namespace + ':' + self.identifier
 
     def add_banco(self, banco: str) -> None:
         """
@@ -1734,6 +1751,7 @@ class EntityGraphics:
 
     Attributes
     ----------
+    namespace : str
     identifier : str
     material : str
     render_controller : str
@@ -1744,6 +1762,7 @@ class EntityGraphics:
     """
     def __init__(
             self,
+            namespace: str,
             identifier: str,
             string_variables: dict = None,
             material: str = 'basic',
@@ -1759,10 +1778,11 @@ class EntityGraphics:
         """
         Parameters
         ----------
+        namespace : str
+            The namespace of this entity.
         identifier : str
-            The unique ID of this entity, including namespace. This must match
-            the ID of a Behaviors object, representing an entity's
-            behavior file.
+            The unique ID of this entity. This must match the ID of a Behaviors
+            object, representing an entity's behavior file.
         string_variables : dict
             A set of string values to match and replace in this behavior JSON
             file when it is written. Likely to be removed in future versions.
@@ -1811,11 +1831,12 @@ class EntityGraphics:
             animations. Each value is the ID of a particle.
         """
 
+        self.namespace: str = namespace
+        """The namespace of this entity."""
         self.identifier: str = identifier
         """
-        The unique ID of this entity, including namespace. This must match
-        the ID of a Behaviors object, representing an entity's
-        behavior file.
+        The unique ID of this entity. This must match the ID of a Behaviors
+        object, representing an entity's behavior file.
         """
         self.material: str = material
         """The ID of the material this entity will use for rendering."""
@@ -1909,6 +1930,17 @@ class EntityGraphics:
             for key in self.geo.keys():
                 self.geo[key] = 'geometry.' + self.geo[key]
 
+    def get_id(self) -> str:
+        """
+        Returns the complete entity identifier, including namespace.
+
+        Returns
+        -------
+        str
+            The full ID of this entity.
+        """
+        return self.namespace + ':' + self.identifier
+
     def add_animations(self, anim_obj: dict) -> None:
         """
         Add animations to be usable by this entity.
@@ -1920,10 +1952,10 @@ class EntityGraphics:
             the the animate list and animation controllers, and each value is
             the ID of an animation.
         """
-        if self.anim_obj is None:
-            self.anim_obj = anim_obj
+        if self._anim_obj is None:
+            self._anim_obj = anim_obj
         else:
-            self.anim_obj.update(anim_obj)
+            self._anim_obj.update(anim_obj)
 
     def add_particles(self, obj: dict) -> None:
         """
@@ -1952,10 +1984,10 @@ class EntityGraphics:
             the arbitrary names set in the entity resource file, not the actual
             IDs of the anims and ancos.
         """
-        if self.animate_list is None:
-            self.animate_list = animate_list
+        if self._animate_list is None:
+            self._animate_list = animate_list
         else:
-            self.animate_list.extend(animate_list)
+            self._animate_list.extend(animate_list)
 
     def add_script_initialize(self, init_list: list[str]) -> None:
         """
@@ -2105,7 +2137,7 @@ class EntityGraphics:
         obj['format_version'] = ENTITY_GRAPHICS_FORMAT_VERSION
 
         desc = {}
-        desc['identifier'] = self.identifier
+        desc['identifier'] = self.get_id()
         if not self.invisible:
             desc['materials'] = {'default': self.material}
             desc['render_controllers'] = [self.render_controller]
@@ -2128,15 +2160,15 @@ class EntityGraphics:
             'overlay_color': self.egg_color_2
         }
 
-        if self.anim_obj is not None:
-            desc['animations'] = self.anim_obj
+        if self._anim_obj is not None:
+            desc['animations'] = self._anim_obj
 
         if self._particle_obj is not None:
             desc['particle_effects'] = self._particle_obj
 
         script_obj = {'scale': str(self.scale)}
-        if self.animate_list is not None:
-            script_obj['animate'] = self.animate_list
+        if self._animate_list is not None:
+            script_obj['animate'] = self._animate_list
         if self.init_list is not None:
             script_obj['initialize'] = self.init_list
         if self.pre_anim is not None:
@@ -2159,6 +2191,14 @@ class Entity:
     Attributes
     ----------
     namespace : str
+    name : str
+    ambient_sound : str
+    hurt_sound : str
+    death_sound : str
+    step_sound : str
+    sounds_pitch_range : list[float]
+    sounds_volume : float
+    egg_name : str
     """
     def __init__(
             self,
@@ -2259,18 +2299,18 @@ class Entity:
         """All behavior pack animation controllers this entity uses."""
         self._current_state = 0
         """The number of the currently active loop state."""
-        self.rancos: list[AnimationController] = []
+        self._rancos: list[AnimationController] = []
         """All resource pack animation controllers this entity uses."""
 
-        self.ambient_sound = ambient_sound
+        self.ambient_sound: str = ambient_sound
         """The ID of a sound this entity will play on occasion at random."""
-        self.hurt_sound = hurt_sound
+        self.hurt_sound: str = hurt_sound
         """The ID of a sound this entity will play when it takes damage."""
-        self.death_sound = death_sound
+        self.death_sound: str = death_sound
         """The ID of the sound this entity will play when it dies."""
-        self.step_sound = step_sound
+        self.step_sound: str = step_sound
         """The ID of a sound this entity will play as it walks."""
-        self.sounds_pitch_range = sounds_pitch_range
+        self.sounds_pitch_range: list[float] = sounds_pitch_range
         """
         The pitch range for all of this entity's sounds. Must be a list of
         two floats, a minimum and maximum value. For example:
@@ -2278,19 +2318,19 @@ class Entity:
         When a sound is played, it will be at a random pitch between these
         values.
         """
-        self.sounds_volume = sounds_volume
+        self.sounds_volume: float = sounds_volume
         """
         The volume to play all this entity's sounds at. How exactly this
         works is strange, so you may need to fiddle with it to get the
         results you need.
         """
 
-        self.identifier: str
+        self._identifier: str
         """The unique ID of this entity."""
         if id is not None:
-            self.identifier = id
+            self._identifier = id
         else:
-            self.identifier = name.lower().replace(' ', '_')
+            self._identifier = name.lower().replace(' ', '_')
 
         self.egg_name: str
         """The display name of this entity's spawn egg."""
@@ -2311,7 +2351,8 @@ class Entity:
             self.graphics = entity_graphics
         elif has_graphics:
             self.graphics = EntityGraphics(
-                self.get_id(),
+                self.namespace,
+                self._identifier,
                 string_variables=self.string_variables,
                 invisible=invisible
             )
@@ -2319,7 +2360,8 @@ class Entity:
             self.graphics = None
 
         self.behaviors = Behaviors(
-            self.get_id(),
+            self.namespace,
+            self._identifier,
             self.string_variables,
             runtime_identifier
         )
@@ -2351,9 +2393,9 @@ class Entity:
         Returns
         -------
         str
-            The full ID of this event.
+            The full ID of this entity.
         """
-        return self.namespace + ':' + self.identifier
+        return self.namespace + ':' + self._identifier
 
     def add_component(self, component: Component) -> None:
         """
@@ -2421,7 +2463,7 @@ class Entity:
             The index of this banco within the Entity's banco list.
         """
         banco = AnimationController(
-            'controller.animation.' + self.identifier + '_' + banco_name,
+            'controller.animation.' + self._identifier + '_' + banco_name,
             initial_state=initial_state,
             string_variables=self.string_variables
         )
@@ -2476,18 +2518,18 @@ class Entity:
             The index of this ranco within the Entity's ranco list.
         """
         ranco = AnimationController(
-            'controller.animation.' + self.identifier + '_' + ranco_name,
+            'controller.animation.' + self._identifier + '_' + ranco_name,
             initial_state=initial_state,
             string_variables=self.string_variables
         )
-        self.rancos.append(ranco)
+        self._rancos.append(ranco)
 
         if self.graphics is not None:
             self.graphics.add_ranco(ranco)
         else:
             print('WARNING: ranco added to entity without graphics')
 
-        return len(self.rancos)-1
+        return len(self._rancos)-1
 
     def add_ranco(self, ranco: AnimationController) -> int:
         """
@@ -2503,12 +2545,12 @@ class Entity:
         int
             The index of this ranco within the Entity's ranco list.
         """
-        self.rancos.append(ranco)
+        self._rancos.append(ranco)
         if self.graphics is not None:
             self.graphics.add_ranco(ranco)
         else:
             print('WARNING: ranco added to entity without graphics')
-        return len(self.rancos)-1
+        return len(self._rancos)-1
 
     def add_banco_state(self, banco_idx: int, state: AncoState) -> None:
         """
@@ -2534,7 +2576,7 @@ class Entity:
         state : AncoState
             The animation controller state to add.
         """
-        self.rancos[ranco_idx].add_state(state)
+        self._rancos[ranco_idx].add_state(state)
 
     def add_spawn_group(self, group: str) -> None:
         """
@@ -2571,10 +2613,10 @@ class Entity:
         id : str
             This entity's new ID.
         """
-        self.identifier = id
-        self.behaviors.identifier = self.get_id()
+        self._identifier = id
+        self.behaviors.identifier = self._identifier
         if self.graphics is not None:
-            self.graphics.identifier = self.get_id()
+            self.graphics.identifier = self._identifier
 
     def current_lstate(self) -> str:
         """
@@ -2755,10 +2797,10 @@ class Entity:
             ranco_state._transition_time = anim_blend_time
             self.add_ranco_state(ranco_id, ranco_state)
 
-            self.rancos[ranco_id].initial_state = 'init'
-            if not self.rancos[ranco_id].has_state('init'):
+            self._rancos[ranco_id].initial_state = 'init'
+            if not self._rancos[ranco_id].has_state('init'):
                 self.add_ranco_state(ranco_id, AncoState('init'))
-            self.rancos[ranco_id].get_state('init').add_transition(
+            self._rancos[ranco_id].get_state('init').add_transition(
                 self.current_lstate(),
                 'query.skin_id=='+str(self._current_state)
             )
