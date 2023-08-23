@@ -1,6 +1,9 @@
 # Changelog
 
 
+## Version 0.2.3 (unreleased)
+
+
 ## Version 0.2.2 (2023-08-22)
 
 ### Additions
