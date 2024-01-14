@@ -5,7 +5,7 @@
 
 ### Additions
 * Add pytest unit test folder
-* Add unit tests for _command_stem(), selector(), tp(), effect(), summon(), tag(), summon_rider(), event(), and execute()
+* Add unit tests for all functions in command.py
 
 
 ## Version 0.2.2 (2023-08-22)
