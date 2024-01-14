@@ -490,7 +490,7 @@ def summon(
 
     uses_facing = False
     if (
-        y_rot is not None or
+        (y_rot is not None and x_rot is not None) or
         facing_target is not None or
         facing_x is not None
     ):
@@ -499,10 +499,10 @@ def summon(
     if not uses_facing and name is not None:
         ret += f' "{name}"'
 
-    if x is not None:
+    if x is not None and y is not None and z is not None:
         ret += f' {x} {y} {z}'
 
-        if y_rot is not None:
+        if y_rot is not None and x_rot is not None:
             ret += f' {y_rot} {x_rot}'
         elif facing_target is not None:
             ret += f' facing {facing_target}'
