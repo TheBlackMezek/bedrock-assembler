@@ -551,12 +551,21 @@ def tag(
         Example: '/tag @e[r=10] add marked_for_explode'
     """
     ret = _command_stem('tag', selector, include_slash)
+    if (mode_add or mode_remove) and tag_id is None:
+        raise MissingParameterError(
+            "'tag_id' must be supplied if using 'mode_add' or 'mode_remove'."
+        )
     if mode_add:
         ret += ' add '+tag_id
     elif mode_remove:
         ret += ' remove '+tag_id
     elif mode_list:
         ret += ' list'
+    else:
+        raise MissingParameterError(
+            "One of the following must be True: "
+            "'mode_add', 'mode_remove', or 'mode_list'."
+        )
 
     return ret
 
