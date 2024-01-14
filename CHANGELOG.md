@@ -5,7 +5,7 @@
 
 ### Additions
 * Add pytest unit test folder
-* Add unit tests for _command_stem(), selector(), tp(), and execute()
+* Add unit tests for _command_stem(), selector(), tp(), effect(), and execute()
 
 
 ## Version 0.2.2 (2023-08-22)
