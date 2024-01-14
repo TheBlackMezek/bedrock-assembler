@@ -363,7 +363,7 @@ def tp(
 def effect(
         selector: str,
         effect: str = None,
-        duration: float = 1.0,
+        duration: int = 1,
         level: int = 1,
         hide_particles: bool = False,
         clear: bool = False,
@@ -407,6 +407,10 @@ def effect(
     if clear:
         ret += ' clear'
         return ret
+    elif effect is None:
+        raise MissingParameterError(
+            "Either 'effect' must be provided OR 'clear' must be True."
+        )
     ret += ' '+effect
     ret += f' {duration}'
     ret += f' {level}'
