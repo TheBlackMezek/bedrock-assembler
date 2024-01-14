@@ -2,6 +2,7 @@
 Module containing functions for generating in-game commands
 and elements of commands.
 """
+from brockassemble.exceptions import MissingParameterError
 
 
 def selector(
@@ -335,14 +336,22 @@ def tp(
 
     if target_selector is not None:
         ret += ' '+target_selector
+    elif x is not None and y is not None and z is not None:
+        ret += f' {x} {y} {z}'
     else:
-        ret += f' {x} {y}{ z}'
+        raise MissingParameterError(
+            "Either 'target_selector' OR 'x', 'y', and 'z' "
+            "MUST be provided to tp()"
+        )
 
-    if x_rot is not None:
+    if x_rot is not None and y_rot is not None:
         ret += f' {x_rot} {y_rot}'
     elif facing_selector is not None:
         ret += ' '+facing_selector
-    elif facing_x is not None:
+    elif (
+            facing_x is not None and
+            facing_y is not None and
+            facing_z is not None):
         ret += f' {facing_x} {facing_y} {facing_z}'
 
     if check_for_blocks:
