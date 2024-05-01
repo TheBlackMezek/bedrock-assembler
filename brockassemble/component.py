@@ -2,6 +2,7 @@
 Module containing the Component class and functions for generating various
 entity components.
 """
+from brockassemble.exceptions import MissingParameterError
 
 
 class Component:
@@ -270,9 +271,13 @@ def component_attack(
     """
     comp = Component('attack')
     comp.json_obj['damage'] = dmg
-    if effect_id is not None:
+    if (effect_id, effect_duration).count(None) == 1:
+        raise MissingParameterError(
+            "Either 'effect_id' and 'effect_duration' must both be used, "
+            "OR they must both be None"
+        )
+    else:
         comp.json_obj['effect_name'] = effect_id
-    if effect_duration is not None:
         comp.json_obj['effect_duration'] = effect_duration
     return comp
 
