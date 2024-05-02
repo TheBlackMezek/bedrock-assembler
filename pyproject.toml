@@ -17,3 +17,6 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/TheBlackMezek/bedrock-assembler"
 "Bug Tracker" = "https://github.com/TheBlackMezek/bedrock-assembler/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["brockassemble"]
