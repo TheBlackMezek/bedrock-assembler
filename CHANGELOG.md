@@ -1,6 +1,14 @@
 # Changelog
 
 
+## Version 0.2.3 (2024-05-02)
+
+### Additions
+* Add pytest unit test folder
+* Add unit tests for all functions in command.py
+* Add unit tests for all functions and classes in component.py
+
+
 ## Version 0.2.2 (2023-08-22)
 
 ### Additions

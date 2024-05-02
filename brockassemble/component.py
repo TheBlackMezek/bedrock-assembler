@@ -2,6 +2,7 @@
 Module containing the Component class and functions for generating various
 entity components.
 """
+from brockassemble.exceptions import MissingParameterError
 
 
 class Component:
@@ -270,9 +271,13 @@ def component_attack(
     """
     comp = Component('attack')
     comp.json_obj['damage'] = dmg
-    if effect_id is not None:
+    if (effect_id, effect_duration).count(None) == 1:
+        raise MissingParameterError(
+            "Either 'effect_id' and 'effect_duration' must both be used, "
+            "OR they must both be None"
+        )
+    else:
         comp.json_obj['effect_name'] = effect_id
-    if effect_duration is not None:
         comp.json_obj['effect_duration'] = effect_duration
     return comp
 
@@ -529,6 +534,46 @@ def component_rideable(
     Component
         A ridable Component.
     """
+    # seat_positions error checks
+    if type(seat_positions) is not list:
+        raise TypeError(
+            f"seat_positions is type {type(seat_positions)} instead of a list"
+        )
+    for pos_set in seat_positions:
+        if type(pos_set) is not list:
+            raise TypeError(
+                f"An element of seat_positions is type {type(pos_set)} "
+                "instead of a list"
+            )
+        if len(pos_set) != 3:
+            raise ValueError(
+                f"An element of seat_positions has {len(pos_set)} elements "
+                "but it must have exactly 3"
+            )
+        for coord in pos_set:
+            if type(coord) is not float and type(coord) is not int:
+                raise TypeError(
+                    f"An element in a seat position is type {type(coord)} "
+                    "instead of a number"
+                )
+    # family_types error checks
+    if type(family_types) is not list:
+        raise TypeError(
+            f"family_types is type {type(family_types)} instead of a list"
+        )
+    for family in family_types:
+        if type(family) is not str:
+            raise TypeError(
+                f"An element of family_types is type {type(family)} "
+                "instead of a string"
+            )
+    # pull_in_entities error check
+    if type(pull_in_entities) is not bool:
+        raise TypeError(
+            f"pull_in_entities is type {type(pull_in_entities)} "
+            "instead of a bool"
+        )
+    # Component assembly
     comp = Component('rideable')
     comp.json_obj['seat_count'] = len(seat_positions)
     comp.json_obj['family_types'] = family_types
@@ -725,6 +770,20 @@ def tag_sensor_list(
         An environment_sensor Component which detects when any of a set of tags
         are applied to the entity and calls a corresponding event.
     """
+    # Error checks
+    for tag in tags:
+        if type(tag) is not str:
+            raise TypeError(
+                f"An element of tags is type {type(tag)} "
+                "instead of a string"
+            )
+    for event in events:
+        if type(event) is not str:
+            raise TypeError(
+                f"An element of events is type {type(event)} "
+                "instead of a string"
+            )
+    # Component construction
     comp = Component('environment_sensor')
     comp.json_obj = {
         "triggers": []

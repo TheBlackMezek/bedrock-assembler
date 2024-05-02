@@ -2,6 +2,7 @@
 Module containing functions for generating in-game commands
 and elements of commands.
 """
+from brockassemble.exceptions import MissingParameterError
 
 
 def selector(
@@ -335,14 +336,22 @@ def tp(
 
     if target_selector is not None:
         ret += ' '+target_selector
+    elif x is not None and y is not None and z is not None:
+        ret += f' {x} {y} {z}'
     else:
-        ret += f' {x} {y}{ z}'
+        raise MissingParameterError(
+            "Either 'target_selector' OR 'x', 'y', and 'z' "
+            "MUST be provided to tp()"
+        )
 
-    if x_rot is not None:
+    if x_rot is not None and y_rot is not None:
         ret += f' {x_rot} {y_rot}'
     elif facing_selector is not None:
         ret += ' '+facing_selector
-    elif facing_x is not None:
+    elif (
+            facing_x is not None and
+            facing_y is not None and
+            facing_z is not None):
         ret += f' {facing_x} {facing_y} {facing_z}'
 
     if check_for_blocks:
@@ -354,7 +363,7 @@ def tp(
 def effect(
         selector: str,
         effect: str = None,
-        duration: float = 1.0,
+        duration: int = 1,
         level: int = 1,
         hide_particles: bool = False,
         clear: bool = False,
@@ -398,6 +407,10 @@ def effect(
     if clear:
         ret += ' clear'
         return ret
+    elif effect is None:
+        raise MissingParameterError(
+            "Either 'effect' must be provided OR 'clear' must be True."
+        )
     ret += ' '+effect
     ret += f' {duration}'
     ret += f' {level}'
@@ -477,7 +490,7 @@ def summon(
 
     uses_facing = False
     if (
-        y_rot is not None or
+        (y_rot is not None and x_rot is not None) or
         facing_target is not None or
         facing_x is not None
     ):
@@ -486,10 +499,10 @@ def summon(
     if not uses_facing and name is not None:
         ret += f' "{name}"'
 
-    if x is not None:
+    if x is not None and y is not None and z is not None:
         ret += f' {x} {y} {z}'
 
-        if y_rot is not None:
+        if y_rot is not None and x_rot is not None:
             ret += f' {y_rot} {x_rot}'
         elif facing_target is not None:
             ret += f' facing {facing_target}'
@@ -538,12 +551,21 @@ def tag(
         Example: '/tag @e[r=10] add marked_for_explode'
     """
     ret = _command_stem('tag', selector, include_slash)
+    if (mode_add or mode_remove) and tag_id is None:
+        raise MissingParameterError(
+            "'tag_id' must be supplied if using 'mode_add' or 'mode_remove'."
+        )
     if mode_add:
         ret += ' add '+tag_id
     elif mode_remove:
         ret += ' remove '+tag_id
     elif mode_list:
         ret += ' list'
+    else:
+        raise MissingParameterError(
+            "One of the following must be True: "
+            "'mode_add', 'mode_remove', or 'mode_list'."
+        )
 
     return ret
 
