@@ -770,6 +770,20 @@ def tag_sensor_list(
         An environment_sensor Component which detects when any of a set of tags
         are applied to the entity and calls a corresponding event.
     """
+    # Error checks
+    for tag in tags:
+        if type(tag) is not str:
+            raise TypeError(
+                f"An element of tags is type {type(tag)} "
+                "instead of a string"
+            )
+    for event in events:
+        if type(event) is not str:
+            raise TypeError(
+                f"An element of events is type {type(event)} "
+                "instead of a string"
+            )
+    # Component construction
     comp = Component('environment_sensor')
     comp.json_obj = {
         "triggers": []
