@@ -36,9 +36,23 @@ def test_init_id_from_name():
 
 def test_init_tex_with_arg():
     item = Item(_test_namespace, _test_name, texture_name=_test_tex_name)
-    assert item._texture_name == _test_tex_name
+    assert item.texture_name == _test_tex_name
 
 
 def test_init_tex_from_id():
     item = Item(_test_namespace, _test_name)
-    assert item._texture_name == _test_id_from_name
+    assert item.texture_name == _test_id_from_name
+
+
+def test_set_tex_name_variable():
+    test_value = 'new_texture'
+    item = Item(_test_namespace, _test_name)
+    item.texture_name = test_value
+    assert item.texture_name == test_value
+
+
+def test_set_tex_name_component():
+    test_value = 'new_texture'
+    item = Item(_test_namespace, _test_name)
+    item.texture_name = test_value
+    assert item._icon_comp.json_obj['texture'] == test_value

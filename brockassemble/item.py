@@ -75,22 +75,33 @@ class Item:
         else:
             self.identifier = name.lower().replace(' ', '_')
 
-        self._texture_name: str
+        self._icon_comp = Component('icon')
+        """
+        The component which stores the name of the item's icon texture.
+        Automatically added to the item component list on init.
+        """
+        self.components.append(self._icon_comp)
+
+        self.texture_name: str
         """The file name of the inventory icon this item will use."""
         if texture_name is not None:
-            self._texture_name = texture_name
+            self.texture_name = texture_name
         else:
-            self._texture_name = self.identifier
-
-        # Give the item type its inventory icon
-        icon_comp = Component('icon')
-        icon_comp.json_obj['texture'] = self._texture_name
-        self.components.append(icon_comp)
+            self.texture_name = self.identifier
 
         # Give the item type its display name
         name_comp = Component('display_name')
         name_comp.json_obj['value'] = self._name
         self.components.append(name_comp)
+
+    @property
+    def texture_name(self):
+        return self._texture_name
+
+    @texture_name.setter
+    def texture_name(self, value: str):
+        self._texture_name = value
+        self._icon_comp.json_obj['texture'] = value
 
     def get_json(self) -> dict:
         """
@@ -120,16 +131,6 @@ class Item:
         obj['minecraft:item'] = item
 
         return obj
-
-    def set_texture(self, texid: str) -> None:
-        """
-        Set this item type's inventory icon. Make sure it points to a real
-        texture in your resource pack.
-        """
-        self._texture_name = texid
-        icon_comp = Component('icon')
-        icon_comp.json_obj['texture'] = self._texture_name
-        self.components[0] = icon_comp
 
     def set_display_name(self, name: str) -> None:
         """Set this item's display name."""
