@@ -70,3 +70,8 @@ def test_set_name_component():
     item = Item(_test_namespace, _test_name)
     item.name = test_value
     assert item._name_comp.json_obj['value'] == test_value
+
+
+def test_get_id():
+    item = Item(_test_namespace, _test_name)
+    assert item.get_id() == f'{_test_namespace}:{_test_id_from_name}'
