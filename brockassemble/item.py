@@ -100,6 +100,13 @@ class Item:
         else:
             self.texture_name = self.identifier
 
+        self.on_use_command: str = None
+        """
+        If used, will be compiled into an event which runs on right-click
+        during get_json().
+        Must be a valid command string, or it will not work in-game.
+        """
+
     @property
     def texture_name(self):
         return self._texture_name
@@ -123,6 +130,16 @@ class Item:
         Compile this item type's components, events, and other attributes into
         a dict ready for writing as an item's JSON behavior file.
         """
+        if self.on_use_command is not None:
+            comp = Component('on_use')
+            comp.json_obj['on_use'] = {'event': 'on_use', 'target': 'self'}
+            self.components.append(comp)
+            event = Component('on_use')
+            event.json_obj['run_command'] = {
+                'command': [self.on_use_command], 'target': 'holder'
+            }
+            self.events.append(event)
+
         obj = {}
 
         obj['format_version'] = ITEM_BVR_FORMAT_VERSION
@@ -146,20 +163,6 @@ class Item:
         obj['minecraft:item'] = item
 
         return obj
-
-    def add_on_use_command(self, command: str) -> None:
-        """
-        Add a command which the item will execute on "use"
-        (right click on desktop).
-        """
-        comp = Component('on_use')
-        comp.json_obj['on_use'] = {'event': 'on_use', 'target': 'self'}
-        self.components.append(comp)
-        event = Component('on_use')
-        event.json_obj['run_command'] = {
-            'command': [command], 'target': 'holder'
-        }
-        self.events.append(event)
 
     def get_id(self) -> str:
         """

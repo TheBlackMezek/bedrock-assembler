@@ -75,3 +75,20 @@ def test_set_name_component():
 def test_get_id():
     item = Item(_test_namespace, _test_name)
     assert item.get_id() == f'{_test_namespace}:{_test_id_from_name}'
+
+
+def test_on_use_cmd_comp():
+    test_value = 'say Hi!'
+    item = Item(_test_namespace, _test_name)
+    item.on_use_command = test_value
+    obj = item.get_json()
+    assert 'minecraft:on_use' in obj['minecraft:item']['components'].keys()
+
+
+def test_on_use_cmd_event():
+    test_value = 'say Hi!'
+    item = Item(_test_namespace, _test_name)
+    item.on_use_command = test_value
+    obj = item.get_json()
+    event = obj['minecraft:item']['events']['on_use']
+    assert event['run_command']['command'] == [test_value]
