@@ -1,4 +1,4 @@
-from brockassemble.item import Item
+from brockassemble.item import Item, ITEM_BVR_FORMAT_VERSION
 
 
 _test_namespace = 'testspace'
@@ -92,3 +92,24 @@ def test_on_use_cmd_event():
     obj = item.get_json()
     event = obj['minecraft:item']['events']['on_use']
     assert event['run_command']['command'] == [test_value]
+
+
+def test_json_identifier():
+    item = Item(_test_namespace, _test_name)
+    obj = item.get_json()
+    desc = obj['minecraft:item']['description']
+    assert desc['identifier'] == f'{_test_namespace}:{_test_id_from_name}'
+
+
+def test_json_category():
+    test_value = 'Tools'
+    item = Item(_test_namespace, _test_name, category=test_value)
+    obj = item.get_json()
+    desc = obj['minecraft:item']['description']
+    assert desc['category'] == test_value
+
+
+def test_json_format_version():
+    item = Item(_test_namespace, _test_name)
+    obj = item.get_json()
+    assert obj['format_version'] == ITEM_BVR_FORMAT_VERSION
