@@ -16,7 +16,7 @@ def test_init_namespace():
 
 def test_init_name():
     item = Item(_test_namespace, _test_name)
-    assert item._name == _test_name
+    assert item.name == _test_name
 
 
 def test_init_items():
@@ -44,7 +44,7 @@ def test_init_tex_from_id():
     assert item.texture_name == _test_id_from_name
 
 
-def test_set_tex_name_variable():
+def test_set_tex_name_property():
     test_value = 'new_texture'
     item = Item(_test_namespace, _test_name)
     item.texture_name = test_value
@@ -56,3 +56,17 @@ def test_set_tex_name_component():
     item = Item(_test_namespace, _test_name)
     item.texture_name = test_value
     assert item._icon_comp.json_obj['texture'] == test_value
+
+
+def test_set_name_property():
+    test_value = 'new_name'
+    item = Item(_test_namespace, _test_name)
+    item.name = test_value
+    assert item.name == test_value
+
+
+def test_set_name_component():
+    test_value = 'new_name'
+    item = Item(_test_namespace, _test_name)
+    item.name = test_value
+    assert item._name_comp.json_obj['value'] == test_value

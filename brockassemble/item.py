@@ -47,22 +47,40 @@ class Item:
             The category of this item type.
         """
 
+        # Components are added first because they are referenced later by
+        # property setters.
+        self.components: list[Component] = []
+        """
+        A list of all the item components which are part of this item type.
+        """
+
+        self._name_comp = Component('display_name')
+        """
+        The component which stores the in-game display name of the item.
+        Automatically added to the item component list on init.
+        """
+        self.components.append(self._name_comp)
+
+        self._icon_comp = Component('icon')
+        """
+        The component which stores the name of the item's icon texture.
+        Automatically added to the item component list on init.
+        """
+        self.components.append(self._icon_comp)
+
+        # Variables and properties can now be set safely.
         self.namespace = namespace
         """
         The namespace for this item type, which will be prefixed to
         the item ID.
         This should probably be the same as all other namespaces in your addon.
         """
-        self._name = name
+        self.name = name
         """
         The display name for this item type.
         """
         self.category = category
         """The category of this item type."""
-        self.components: list[Component] = []
-        """
-        A list of all the item components which are part of this item type.
-        """
         self.events: list[Component] = []
         """
         A list of all the item events which are part of this item type.
@@ -75,24 +93,12 @@ class Item:
         else:
             self.identifier = name.lower().replace(' ', '_')
 
-        self._icon_comp = Component('icon')
-        """
-        The component which stores the name of the item's icon texture.
-        Automatically added to the item component list on init.
-        """
-        self.components.append(self._icon_comp)
-
         self.texture_name: str
         """The file name of the inventory icon this item will use."""
         if texture_name is not None:
             self.texture_name = texture_name
         else:
             self.texture_name = self.identifier
-
-        # Give the item type its display name
-        name_comp = Component('display_name')
-        name_comp.json_obj['value'] = self._name
-        self.components.append(name_comp)
 
     @property
     def texture_name(self):
@@ -102,6 +108,15 @@ class Item:
     def texture_name(self, value: str):
         self._texture_name = value
         self._icon_comp.json_obj['texture'] = value
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value: str):
+        self._name = value
+        self._name_comp.json_obj['value'] = value
 
     def get_json(self) -> dict:
         """
@@ -134,9 +149,9 @@ class Item:
 
     def set_display_name(self, name: str) -> None:
         """Set this item's display name."""
-        self._name = name
+        self.name = name
         name_comp = Component('display_name')
-        name_comp.json_obj['value'] = self._name
+        name_comp.json_obj['value'] = self.name
         self.components[1] = name_comp
 
     def add_on_use_command(self, command: str) -> None:
