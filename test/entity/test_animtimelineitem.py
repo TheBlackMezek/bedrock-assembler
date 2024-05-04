@@ -24,7 +24,7 @@ def test_add_cmd():
     assert ati.get_json() == cmds
 
 
-def test_add_cmd2():
+def test_add_cmds():
     cmd1 = 'say Hi!'
     cmd2 = 'say Bye!'
     cmd3 = 'say What is the air speed of an unladen swallow?'
