@@ -1,15 +1,22 @@
 # Changelog
 
 
-## Version 0.2.4 (unreleased)
+## Version 0.2.4 (2024-05-03)
+
+### Additions
+* Unit tests for Item class
+
+### Fixes & Improvements
+* Turn Item texture_name and name variables into properties to automatically set their related component values
+* Remove Item.add_on_use_command() in favor of an Item.on_use_command variable which is compiled into a component and event in Item.get_json().
 
 
 ## Version 0.2.3 (2024-05-02)
 
 ### Additions
-* Add pytest unit test folder
-* Add unit tests for all functions in command.py
-* Add unit tests for all functions and classes in component.py
+* pytest unit test folder
+* Unit tests for all functions in command.py
+* Unit tests for all functions and classes in component.py
 
 
 ## Version 0.2.2 (2023-08-22)
