@@ -147,13 +147,6 @@ class Item:
 
         return obj
 
-    def set_display_name(self, name: str) -> None:
-        """Set this item's display name."""
-        self.name = name
-        name_comp = Component('display_name')
-        name_comp.json_obj['value'] = self.name
-        self.components[1] = name_comp
-
     def add_on_use_command(self, command: str) -> None:
         """
         Add a command which the item will execute on "use"
