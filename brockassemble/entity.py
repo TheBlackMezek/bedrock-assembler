@@ -761,17 +761,17 @@ class Event:
         The namespace for this event. Not required for custom events, but
         hard-coded Bedrock events require the "minecraft" namespace.
         """
-        self._add_groups = []
+        self._add_groups: list[str] = []
         """IDs of component groups this event will add."""
-        self._remove_groups = []
+        self._remove_groups: list[str] = []
         """IDs of component groups this event will remove."""
-        self._randomizers = []
+        self._randomizers: list[EventRandomizer] = []
         """
         List of EventRandomizers in this event. When the event is called,
         one of these will be randomly selected, in addition to the normal
         add and remove groups.
         """
-        self._sequential_events = []
+        self._sequential_events: list['Event'] = []
         """List of sub-Events which are sequentially executed in this event."""
         self._set_properties = {}
         """
@@ -779,7 +779,7 @@ class Event:
         key = Entity property ID.\n
         value = What to set the entity property to.
         """
-        self._next_event = None
+        self._next_event: str = next_event
         """ID of another event which will be called after this one."""
 
         if add_groups is not None:
