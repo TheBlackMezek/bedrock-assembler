@@ -3,6 +3,9 @@
 
 ## Version 0.2.5 (unreleased)
 
+### Fixes & Improvements
+* Fixed use of an outdated variable name in EntityGraphics
+
 
 ## Version 0.2.4 (2024-05-03)
 
