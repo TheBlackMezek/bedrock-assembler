@@ -13,8 +13,8 @@
 * Unit tests for Item class
 
 ### Fixes & Improvements
-* Turn Item texture_name and name variables into properties to automatically set their related component values
-* Remove Item.add_on_use_command() in favor of an Item.on_use_command variable which is compiled into a component and event in Item.get_json().
+* Turned Item texture_name and name variables into properties to automatically set their related component values
+* Removed Item.add_on_use_command() in favor of an Item.on_use_command variable which is compiled into a component and event in Item.get_json()
 
 
 ## Version 0.2.3 (2024-05-02)
