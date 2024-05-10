@@ -1967,10 +1967,10 @@ class EntityGraphics:
             The animation to add. Each key is an arbitrary name used by
             animations, and each value is the ID of a particle.
         """
-        if self.particle_obj is None:
-            self.particle_obj = obj
+        if self._particle_obj is None:
+            self._particle_obj = obj
         else:
-            self.particle_obj.update(obj)
+            self._particle_obj.update(obj)
 
     def add_animate_list(self, animate_list: list[str]) -> None:
         """
